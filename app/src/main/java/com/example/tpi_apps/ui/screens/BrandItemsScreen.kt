@@ -55,17 +55,15 @@ fun BrandItemsScreen(
                 )
             )
     ) {
-        // Background Image Overlay
         Image(
             painter = painterResource(id = R.drawable.hero_bg),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.FillBounds,
-            alpha = 0.2f
+            contentScale = ContentScale.Crop,
+            alpha = 0.30f
         )
 
         Column(modifier = Modifier.fillMaxSize()) {
-            // Header: Search and Notification (reused style from Hero)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -160,7 +158,6 @@ fun BrandFoodCard(food: Food) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Header row: Title and Heart
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -206,14 +203,12 @@ fun BrandFoodCard(food: Food) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Images Grid
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(160.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Main Image
                 Image(
                     painter = painterResource(id = R.drawable.review_card_bigmac),
                     contentDescription = null,
@@ -224,7 +219,6 @@ fun BrandFoodCard(food: Food) {
                     contentScale = ContentScale.Crop
                 )
 
-                // Secondary Images column
                 Column(
                     modifier = Modifier
                         .weight(1f)
