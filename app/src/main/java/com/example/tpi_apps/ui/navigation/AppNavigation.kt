@@ -12,6 +12,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import com.example.tpi_apps.ui.screens.CrearReseniaScreen
 import com.example.tpi_apps.ui.screens.ExplorarScreen
+import com.example.tpi_apps.ui.screens.BrandItemsScreen
 
 @Composable
 fun AppNavigation(
@@ -59,7 +60,15 @@ fun AppNavigation(
             enterTransition = { fadeIn(animationSpec = tween(400)) },
             exitTransition = { fadeOut(animationSpec = tween(400)) }
         ) {
-            ExplorarScreen()
+            ExplorarScreen(navController = navController)
+        }
+        composable(
+            Routes.BrandItems.route,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) }
+        ) { backStackEntry ->
+            val brandName = backStackEntry.arguments?.getString("brandName") ?: ""
+            BrandItemsScreen(brandName = brandName)
         }
         composable(
             Routes.Perfil.route,

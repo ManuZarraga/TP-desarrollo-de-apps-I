@@ -2,6 +2,7 @@ package com.example.tpi_apps.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -28,6 +29,7 @@ import com.example.tpi_apps.ui.components.SectionHeader
 
 @Composable
 fun ExplorarScreen(
+    navController: androidx.navigation.NavController,
     modifier: Modifier = Modifier,
     viewModel: ExplorarViewModel = viewModel()
 ) {
@@ -69,13 +71,18 @@ fun ExplorarScreen(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 32.dp),
+                    .padding(horizontal = 40.dp),
                 contentPadding = PaddingValues(bottom = 16.dp, top = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(24.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                horizontalArrangement = Arrangement.spacedBy(28.dp),
+                verticalArrangement = Arrangement.spacedBy(28.dp)
             ) {
                 items(brands) { brand ->
-                    BrandCard(brand = brand)
+                    BrandCard(
+                        brand = brand,
+                        onClick = {
+                            navController.navigate(com.example.tpi_apps.ui.navigation.Routes.BrandItems.createRoute(brand.name))
+                        }
+                    )
                 }
             }
         }
@@ -83,11 +90,15 @@ fun ExplorarScreen(
 }
 
 @Composable
-fun BrandCard(brand: Brand) {
+fun BrandCard(
+    brand: Brand,
+    onClick: () -> Unit
+) {
     Surface(
         modifier = Modifier
             .aspectRatio(1f)
-            .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp)),
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
+            .clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
         color = brand.backgroundColor
     ) {
@@ -99,7 +110,7 @@ fun BrandCard(brand: Brand) {
                 painter = painterResource(id = brand.imageRes),
                 contentDescription = brand.name,
                 modifier = Modifier
-                    .fillMaxSize(0.5f),
+                    .fillMaxSize(0.6f),
                 contentScale = ContentScale.Fit
             )
         }
