@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tpi_apps.data.model.User
 import androidx.compose.material.icons.filled.*
+import androidx.compose.ui.draw.shadow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,8 +105,11 @@ fun ProfileScreen(
 
             // --- BOX 2: CANASTA DE PUNTOS REESTRUCTURADA ---
             Card(
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 20.dp // Aquí defines qué tan pronunciada es la sombra
+                ),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
                 modifier = Modifier.weight(1f).height(116.dp)
                     .background(
                         Brush.linearGradient(
@@ -115,7 +119,6 @@ fun ProfileScreen(
                             )
                         ), RoundedCornerShape(20.dp)
                     )
-                    .border(1.dp, Color(0xFF4F46E5).copy(alpha = 0.3f), RoundedCornerShape(20.dp))
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize().padding(12.dp),
@@ -214,6 +217,8 @@ fun ProfileScreen(
 
             // --- BOX 4: CARD DE REPUTACIÓN ---
             Card(
+                elevation = CardDefaults.cardElevation(
+                defaultElevation = 20.dp),
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 modifier = Modifier.weight(1f).height(104.dp).border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(20.dp))
@@ -230,6 +235,8 @@ fun ProfileScreen(
 
             // --- BOX 5: CARD DE RESEÑAS HISTORIAL ---
             Card(
+                elevation = CardDefaults.cardElevation(
+                defaultElevation = 20.dp),
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 modifier = Modifier.weight(1f).height(104.dp)
