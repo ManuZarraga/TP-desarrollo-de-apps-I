@@ -30,6 +30,7 @@ fun AppNavigation(
         ) {
             HomeScreen(
                 user = user,
+                navController = navController,
                 onSettingsClick = { /* TODO */ },
                 onReviewsClick = { /* TODO */ }
             )

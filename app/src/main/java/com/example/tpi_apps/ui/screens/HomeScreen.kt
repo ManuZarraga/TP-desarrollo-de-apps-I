@@ -1,84 +1,94 @@
 package com.example.tpi_apps.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.tpi_apps.data.model.User
+import com.example.tpi_apps.logic.HomeViewModel
+import com.example.tpi_apps.ui.components.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     user: User,
+    navController: NavController,
     onSettingsClick: () -> Unit,
     onReviewsClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel()
 ) {
-    val nextLevelPoints = 500
-    val progressPercent = (user.points.toFloat() / nextLevelPoints).coerceIn(0f, 1f)
-    var currentAvatarIdx by remember { mutableStateOf(0) }
-    val avatarOptions = listOf("👤", "🍔", "🍕", "🍰", "🍣", "🌮")
+    val reviews by viewModel.reviews.collectAsState()
+    val foods by viewModel.foods.collectAsState()
+    val selectedCategory by viewModel.selectedCategory.collectAsState()
+    val categories = viewModel.categories
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8FAFC))
-            .padding(16.dp)
-    ) {
-        // --- BOX 1: INFO DE PERFIL BENTO ---
-        Card(
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(24.dp))
+    Scaffold { innerPadding ->
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(innerPadding)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(modifier = Modifier.size(56.dp)) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.size(56.dp).clip(RoundedCornerShape(16.dp))
-                                .background(Brush.linearGradient(colors = listOf(Color(0xFF2563EB), Color(0xFF4F46E5))))
-                        ) {
-                            Text(text = avatarOptions[currentAvatarIdx], fontSize = 28.sp)
-                        }
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier.size(22.dp).align(Alignment.BottomEnd).offset(4.dp, 4.dp).clip(CircleShape)
-                                .background(Color(0xFF1E293B)).clickable { currentAvatarIdx = (currentAvatarIdx + 1) % avatarOptions.size }
-                        ) {
-                            Text("🔄", fontSize = 10.sp, color = Color.White)
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text("Comensal Verificado", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2563EB))
-                        Text(text = user.name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
-                        Text(text = user.email, fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = Color(0xFF64748B))
+            item {
+                Hero()
+            }
+            
+            item {
+                SectionHeader(
+                    title = "Realidad vs. Marketing",
+                    onSeeAllClick = onReviewsClick
+                )
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    contentPadding = PaddingValues(end = 16.dp)
+                ) {
+                    items(reviews) { review ->
+                        ReviewItem(review = review)
                     }
                 }
             }
+            
+            item {
+                Text(
+                    text = "Categorías",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(16.dp),
+                    color = Color.Black
+                )
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(categories) { category ->
+                        CategoryChip(
+                            category = category,
+                            isSelected = category == selectedCategory,
+                            onClick = { viewModel.onCategorySelected(category) }
+                        )
+                    }
+                }
+            }
+            
+            items(foods) { food ->
+                FoodItem(food = food)
+            }
+            
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
     }
 }
