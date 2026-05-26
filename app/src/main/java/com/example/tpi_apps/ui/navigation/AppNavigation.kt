@@ -11,6 +11,7 @@ import com.example.tpi_apps.ui.screens.ProfileScreen
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import com.example.tpi_apps.ui.screens.CrearReseniaScreen
+import com.example.tpi_apps.ui.screens.ExplorarScreen
 
 @Composable
 fun AppNavigation(
@@ -54,11 +55,11 @@ fun AppNavigation(
             )
         }
         composable(
-            Routes.Resenia.route,
+            Routes.Explorar.route,
             enterTransition = { fadeIn(animationSpec = tween(400)) },
             exitTransition = { fadeOut(animationSpec = tween(400)) }
         ) {
-
+            ExplorarScreen()
         }
         composable(
             Routes.Perfil.route,

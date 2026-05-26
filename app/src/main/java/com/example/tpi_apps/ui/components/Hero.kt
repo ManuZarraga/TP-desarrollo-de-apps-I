@@ -33,7 +33,8 @@ data class HeroSlide(
 fun Hero(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    placeholderText: String = "Buscar productos específicos"
 ) {
     val slides = listOf(
         HeroSlide(
