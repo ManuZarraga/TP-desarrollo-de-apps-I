@@ -8,6 +8,9 @@ import androidx.navigation.compose.composable
 import com.example.tpi_apps.data.model.User
 import com.example.tpi_apps.ui.screens.HomeScreen
 import com.example.tpi_apps.ui.screens.ProfileScreen
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import com.example.tpi_apps.ui.screens.CrearReseniaScreen
 
 @Composable
 fun AppNavigation(
@@ -20,23 +23,47 @@ fun AppNavigation(
         startDestination = Routes.Inicio.route,
         modifier = modifier
     ) {
-        composable(Routes.Inicio.route) {
+        composable(
+            Routes.Inicio.route,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) }
+        ) {
             HomeScreen(
                 user = user,
                 onSettingsClick = { /* TODO */ },
                 onReviewsClick = { /* TODO */ }
             )
         }
-        composable(Routes.Resenia.route) {
+        composable(
+            Routes.Resenia.route,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) }
+        ) {
 
         }
-        composable(Routes.Camara.route) {
+        composable(
+            Routes.Camara.route,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) }
+        ) {
+            CrearReseniaScreen(
+                user = user,
+                onSettingsClick = { /* TODO */ },
+                onReviewsClick = { /* TODO */ }
+            )
+        }
+        composable(
+            Routes.Resenia.route,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) }
+        ) {
 
         }
-        composable(Routes.Explorar.route) {
-
-        }
-        composable(Routes.Perfil.route) {
+        composable(
+            Routes.Perfil.route,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) }
+        ) {
             ProfileScreen(
                 user = user,
                 onSettingsClick = { /* TODO */ },
