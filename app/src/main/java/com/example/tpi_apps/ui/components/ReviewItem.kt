@@ -1,11 +1,8 @@
 package com.example.tpi_apps.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,89 +26,105 @@ fun ReviewItem(
     Card(
         modifier = modifier
             .width(280.dp)
-            .padding(start = 16.dp, end = 8.dp),
+            .padding(start = 16.dp, end = 4.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
-            Box(
+            val imageRes = when {
+                review.itemName.contains("Big Mac", ignoreCase = true) -> R.drawable.review_card_bigmac
+                review.itemName.contains("Pizza", ignoreCase = true) -> R.drawable.review_card_pizza
+                else -> R.drawable.review_card_pastas
+            }
+
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp)
-            ) {
-                // Background Image (Placeholder)
-                Image(
-                    painter = painterResource(id = R.drawable.review_card_pizza), // Placeholder
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-                
-                // Rating badge
-                Row(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .align(Alignment.TopEnd)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color.White.copy(alpha = 0.9f))
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        tint = Color(0xFFFFB800),
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = review.rating.toString(),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp
-                    )
-                }
-            }
+                    .height(150.dp)
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+                contentScale = ContentScale.Crop
+            )
             
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
-                    text = review.restaurantName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    text = "${review.restaurantName}: ${review.itemName}",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 17.sp
+                    ),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color.Black
                 )
-                Text(
-                    text = review.itemName,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                // Stars
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    repeat(5) { index ->
+                        val isSelected = index < review.rating
+                        Icon(
+                            painter = painterResource(
+                                id = if (isSelected) R.drawable.star_selected else R.drawable.star_unselected
+                            ),
+                            contentDescription = null,
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+                }
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    review.itemPrice?.let {
-                        Text(
-                            text = "$${it}",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color(0xFF3A63ED),
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    }
-                    
+                // Date
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.calendar),
+                        contentDescription = null,
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Ver reseña",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = Color(0xFF3A63ED),
-                        fontWeight = FontWeight.Bold
+                        text = review.date,
+                        fontSize = 14.sp,
+                        color = Color.Gray
                     )
                 }
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                // Time
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.clock),
+                        contentDescription = null,
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "${review.time} PM",
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text(
+                    text = "\"${review.comment}\"",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontSize = 13.sp,
+                        color = Color.Gray
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }

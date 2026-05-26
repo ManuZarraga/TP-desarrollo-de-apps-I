@@ -9,7 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.tpi_apps.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.tpi_apps.data.model.User
@@ -26,8 +29,9 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel()
 ) {
     val reviews by viewModel.reviews.collectAsState()
-    val foods by viewModel.foods.collectAsState()
+    val foods by viewModel.filteredFoods.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
     val categories = viewModel.categories
 
     Scaffold { innerPadding ->
@@ -35,12 +39,13 @@ fun HomeScreen(
             modifier = modifier
                 .fillMaxSize()
                 .background(Color.White)
-                .padding(innerPadding)
         ) {
             item {
-                Hero()
+                Hero(
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { viewModel.onSearchQueryChanged(it) }
+                )
             }
-            
             item {
                 SectionHeader(
                     title = "Realidad vs. Marketing",
@@ -59,22 +64,27 @@ fun HomeScreen(
             }
             
             item {
-                Text(
-                    text = "Categorías",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(16.dp),
-                    color = Color.Black
-                )
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp),
+                        .padding(bottom = 8.dp, top = 16.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(categories) { category ->
-                        CategoryChip(
-                            category = category,
+                        val imageRes = when (category) {
+                            "Hamburguesas" -> R.drawable.categoria_hamburguesa
+                            "Pizza" -> R.drawable.categoria_pizza
+                            "Sushi" -> R.drawable.categoria_sushi
+                            "Pastas" -> R.drawable.categoria_pasta
+                            "Shawarma" -> R.drawable.categoria_shawarma
+                            "Postres" -> R.drawable.categoria_helado
+                            else -> R.drawable.categoria_hamburguesa // Fallback
+                        }
+                        
+                        CategoryCard(
+                            name = category,
+                            imageRes = imageRes,
                             isSelected = category == selectedCategory,
                             onClick = { viewModel.onCategorySelected(category) }
                         )

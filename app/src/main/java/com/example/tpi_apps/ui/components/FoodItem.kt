@@ -1,11 +1,8 @@
 package com.example.tpi_apps.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,6 +23,16 @@ fun FoodItem(
     food: Food,
     modifier: Modifier = Modifier
 ) {
+    val imageRes = when (food.category) {
+        "Hamburguesas" -> R.drawable.food_cell1
+        "Pizza", "Pizzas" -> R.drawable.food_cell2
+        "Shawarma", "Shawarmas" -> R.drawable.food_cell3
+        "Sushi", "Sushis" -> R.drawable.food_cell4
+        "Postres", "Postre", "Helado" -> R.drawable.food_cell5
+        "Pasta", "Pastas" -> R.drawable.food_cell6
+        else -> R.drawable.food_cell1
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -37,14 +44,14 @@ fun FoodItem(
         Row(
             modifier = Modifier
                 .padding(12.dp)
-                .height(80.dp),
+                .height(100.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = R.drawable.heroimg2), // Placeholder
+                painter = painterResource(id = imageRes),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(90.dp)
                     .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
@@ -63,42 +70,45 @@ fun FoodItem(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.Black
                     )
                     Text(
-                        text = food.restaurant,
+                        text = food.description,
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
+                        color = Color.Gray,
+                        maxLines = 2,
+                        lineHeight = 16.sp,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
                 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Default.Star,
+                        painter = painterResource(id = R.drawable.reseniaicon),
                         contentDescription = null,
-                        tint = Color(0xFFFFB800),
-                        modifier = Modifier.size(16.dp)
+                        tint = Color(0xFF3A63ED),
+                        modifier = Modifier.size(20.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "${food.rating} (${food.reviewCount} reseñas)",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
+                        text = "${food.reviewCount}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF3A63ED),
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = " · ",
+                        color = Color.Gray,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "$${food.price}",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.Black,
+                        fontWeight = FontWeight.ExtraBold
                     )
                 }
-            }
-            
-            Column(
-                modifier = Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = "$${food.price}",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF3A63ED),
-                    fontWeight = FontWeight.ExtraBold
-                )
             }
         }
     }

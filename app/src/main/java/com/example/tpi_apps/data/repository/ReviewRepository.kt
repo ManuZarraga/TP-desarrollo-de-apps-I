@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.flow
 class ReviewRepository {
     fun getReviews(): Flow<List<Review>> = flow {
         val reviews = listOf(
-            Review(restaurantName = "McDonald's", itemName = "Big Mac", rating = 4, foodCategory = "Hamburguesas", itemPrice = 1200.0, comment = "Muy bueno"),
-            Review(restaurantName = "Burger King", itemName = "Whopper", rating = 5, foodCategory = "Hamburguesas", itemPrice = 1300.0, comment = "Excelente"),
-            Review(restaurantName = "Mostaza", itemName = "Mega Bacon", rating = 3, foodCategory = "Hamburguesas", itemPrice = 1400.0, comment = "Puede mejorar")
+            Review(restaurantName = "Kentucky", itemName = "Pizza Margarita", rating = 5, foodCategory = "Pizzas", itemPrice = 1400.0, comment = "“Llegó en excelente estado, nada corrido y..."),
+            Review(restaurantName = "McDonald's", itemName = "Big Mac", rating = 2, foodCategory = "Hamburguesas", itemPrice = 1200.0, comment = "“Los medallones son chicos y trae poca..."),
+            Review(restaurantName = "La Juvenil", itemName = "Capelletis al Pesto", rating = 4, foodCategory = "Pastas", itemPrice = 1300.0, comment = "“No vino con tantas almendras, pero muy..."),
         )
         emit(reviews)
     }

@@ -11,7 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,22 +30,26 @@ data class HeroSlide(
 )
 
 @Composable
-fun Hero(modifier: Modifier = Modifier) {
+fun Hero(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val slides = listOf(
         HeroSlide(
             "Descubrí la verdadera cara de tus pedidos",
             "Revisá las últimas reseñas de tu plato favorito",
-            R.drawable.heroimg1
+            R.drawable.hero1
         ),
         HeroSlide(
             "Contanos más acerca de tu pedido",
             "Dejanos tu reseña a continuación ¡No olvides agregar una foto!",
-            R.drawable.heroimg2
+            R.drawable.hero2
         ),
         HeroSlide(
             "¿Todavía estás con dudas?",
             "Enterate lo que opinan los demás sobre sus pedidos",
-            R.drawable.heroimg3
+            R.drawable.hero3
         )
     )
 
@@ -54,11 +58,10 @@ fun Hero(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(320.dp)
+            .height(300.dp)
             .clip(RoundedCornerShape(bottomStart = 40.dp, bottomEnd = 40.dp))
             .background(Color(0xFF3A63ED))
     ) {
-        // Background Pattern
         Image(
             painter = painterResource(id = R.drawable.hero_bg),
             contentDescription = null,
@@ -68,40 +71,46 @@ fun Hero(modifier: Modifier = Modifier) {
         )
 
         Column(modifier = Modifier.fillMaxSize()) {
-            // Top Bar: Search and Notification
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 48.dp, start = 20.dp, end = 20.dp),
+                    .statusBarsPadding()
+                    .padding(top = 16.dp, start = 20.dp, end = 20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Surface(
+                TextField(
+                    value = searchQuery,
+                    onValueChange = onSearchQueryChange,
                     modifier = Modifier
                         .weight(1f)
-                        .height(48.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    color = Color.White
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                        .height(54.dp),
+                    placeholder = {
                         Text(
                             text = "Buscar productos específicos",
                             color = Color(0xFF94A3B8),
-                            fontSize = 14.sp,
-                            modifier = Modifier.weight(1f)
+                            fontSize = 14.sp
                         )
+                    },
+                    trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
-                            tint = Color(0xFF64748B),
+                            tint = Color(0xFF3A63ED),
                             modifier = Modifier.size(20.dp)
                         )
-                    }
-                }
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        disabledContainerColor = Color.White,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent,
+                        cursorColor = Color(0xFF3A63ED)
+                    ),
+                    shape = RoundedCornerShape(24.dp),
+                    singleLine = true
+                )
                 Spacer(modifier = Modifier.width(12.dp))
                 Icon(
                     painter = painterResource(id = R.drawable.bell_empty),
@@ -111,7 +120,6 @@ fun Hero(modifier: Modifier = Modifier) {
                 )
             }
 
-            // Slidable Content
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
@@ -120,15 +128,13 @@ fun Hero(modifier: Modifier = Modifier) {
             ) { page ->
                 val slide = slides[page]
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 24.dp)
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxHeight()
                             .fillMaxWidth(0.65f)
-                            .padding(bottom = 40.dp),
+                            .padding(start = 24.dp, bottom = 20.dp),
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
@@ -152,18 +158,18 @@ fun Hero(modifier: Modifier = Modifier) {
                         contentDescription = null,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .size(170.dp),
-                        contentScale = ContentScale.Fit
+                            .fillMaxHeight()
+                            .wrapContentWidth(Alignment.End, unbounded = true),
+                        contentScale = ContentScale.FillHeight
                     )
                 }
             }
         }
 
-        // Animated Dots Indicator
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 24.dp),
+                .padding(bottom = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             repeat(slides.size) { index ->
