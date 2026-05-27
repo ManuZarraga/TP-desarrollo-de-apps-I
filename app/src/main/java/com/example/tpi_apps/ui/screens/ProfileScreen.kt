@@ -49,7 +49,8 @@ fun ProfileScreen(
     val openSettings = {
         showEditDialog = true
     }
-    val userReviews by viewModel<ReviewViewModel>().userReviews.collectAsStateWithLifecycle()
+    val viewModel: ReviewViewModel = viewModel()
+    val userReviews by viewModel.getUserReviews(user.name).collectAsStateWithLifecycle()
     Column(
         modifier = modifier
             .fillMaxSize()

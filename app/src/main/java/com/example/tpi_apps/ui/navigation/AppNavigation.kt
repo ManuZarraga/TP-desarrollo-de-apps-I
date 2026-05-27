@@ -14,6 +14,7 @@ import com.example.tpi_apps.ui.screens.CrearReseniaScreen
 import com.example.tpi_apps.ui.screens.ExplorarScreen
 import com.example.tpi_apps.ui.screens.BrandItemsScreen
 import com.example.tpi_apps.ui.screens.ReseniaScreen
+import com.example.tpi_apps.ui.screens.ConfirmationScreen
 
 @Composable
 fun AppNavigation(
@@ -82,6 +83,13 @@ fun AppNavigation(
                 onSettingsClick = { /* TODO */ },
                 onReviewsClick = { /* TODO */ }
             )
+        }
+        composable(
+            Routes.Confirmacion.route,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) }
+        ) {
+            ConfirmationScreen(navController = navController)
         }
     }
 }

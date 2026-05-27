@@ -12,7 +12,7 @@ enum class ReseniaFilter {
 }
 
 class ReseniaViewModel(
-    private val reviewRepository: ReviewRepository = ReviewRepository()
+    private val reviewRepository: ReviewRepository = ReviewRepository.getInstance()
 ) : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")

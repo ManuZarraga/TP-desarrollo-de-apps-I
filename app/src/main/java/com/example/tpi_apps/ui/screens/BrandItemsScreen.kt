@@ -29,6 +29,7 @@ import com.example.tpi_apps.R
 import com.example.tpi_apps.data.model.Food
 import com.example.tpi_apps.logic.BrandItemsViewModel
 import com.example.tpi_apps.ui.components.BrandFoodItem
+import com.example.tpi_apps.ui.components.ReviewItem
 
 @Composable
 fun BrandItemsScreen(
@@ -132,13 +133,39 @@ fun BrandItemsScreen(
                     )
                 }
             } else {
+                val brandReviews by viewModel.brandReviews.collectAsState()
+
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    item {
+                        Text(
+                            text = "Productos de $brandName",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+                        )
+                    }
                     items(foods) { food ->
                         BrandFoodItem(food = food)
+                    }
+
+                    if (brandReviews.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = "Reseñas de la comunidad",
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+                            )
+                        }
+                        items(brandReviews) { review ->
+                            ReviewItem(review = review, width = null)
+                        }
                     }
                 }
             }

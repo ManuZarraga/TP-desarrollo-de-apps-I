@@ -10,8 +10,17 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class ReviewViewModel(
-    private val repository: ReviewRepository = ReviewRepository()
+    private val repository: ReviewRepository = ReviewRepository.getInstance()
 ) : ViewModel() {
+
+    fun getUserReviews(username: String): StateFlow<List<Review>> = repository
+        .getReviews()
+        .map { reviews -> reviews.filter { it.username == username } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     val userReviews: StateFlow<List<Review>> = repository
         .getReviews()

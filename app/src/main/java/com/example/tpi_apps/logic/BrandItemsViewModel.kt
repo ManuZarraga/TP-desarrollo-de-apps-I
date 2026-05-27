@@ -3,14 +3,20 @@ package com.example.tpi_apps.logic
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tpi_apps.data.model.Food
+import com.example.tpi_apps.data.model.Review
 import com.example.tpi_apps.data.repository.FoodRepository
+import com.example.tpi_apps.data.repository.ReviewRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class BrandItemsViewModel(
     private val brandName: String,
-    private val foodRepository: FoodRepository = FoodRepository()
+    private val foodRepository: FoodRepository = FoodRepository(),
+    private val reviewRepository: ReviewRepository = ReviewRepository.getInstance()
 ) : ViewModel() {
+
+    private val _reviews = MutableStateFlow<List<Review>>(emptyList())
+    val brandReviews: StateFlow<List<Review>> = _reviews.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -28,12 +34,23 @@ class BrandItemsViewModel(
 
     init {
         loadFoods()
+        loadReviews()
     }
 
     private fun loadFoods() {
         viewModelScope.launch {
             foodRepository.getFoods().collect {
                 _foods.value = it
+            }
+        }
+    }
+
+    private fun loadReviews() {
+        viewModelScope.launch {
+            reviewRepository.getReviews().collect { allReviews ->
+                _reviews.value = allReviews.filter { 
+                    it.restaurantName.contains(brandName, ignoreCase = true) 
+                }
             }
         }
     }

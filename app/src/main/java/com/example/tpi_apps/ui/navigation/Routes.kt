@@ -9,4 +9,5 @@ sealed class Routes(val route: String) {
     object BrandItems : Routes("brand_items/{brandName}") {
         fun createRoute(brandName: String) = "brand_items/$brandName"
     }
+    object Confirmacion : Routes("confirmacion")
 }

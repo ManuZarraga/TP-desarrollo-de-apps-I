@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val foodRepository: FoodRepository = FoodRepository(),
-    private val reviewRepository: ReviewRepository = ReviewRepository()
+    private val reviewRepository: ReviewRepository = ReviewRepository.getInstance()
 ) : ViewModel() {
 
     private val _reviews = MutableStateFlow<List<Review>>(emptyList())

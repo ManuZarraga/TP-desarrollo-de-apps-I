@@ -28,6 +28,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.tpi_apps.R
 import com.example.tpi_apps.data.model.User
+import com.example.tpi_apps.logic.CrearReseniaViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tpi_apps.ui.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +39,8 @@ fun CrearReseniaScreen(
     navController: NavController,
     onSettingsClick: () -> Unit,
     onReviewsClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: CrearReseniaViewModel = viewModel()
 ) {
     var restaurante by remember { mutableStateOf("") }
     var pedido by remember { mutableStateOf("") }
@@ -293,7 +297,18 @@ fun CrearReseniaScreen(
 
                     item {
                         Button(
-                            onClick = { /* TODO: Submit review and increment user XP */ },
+                            onClick = {
+                                if (restaurante.isNotEmpty() && pedido.isNotEmpty() && puntuacion > 0) {
+                                    viewModel.submitReview(
+                                        user = user,
+                                        restaurantName = restaurante,
+                                        itemName = pedido,
+                                        rating = puntuacion,
+                                        comment = comentario
+                                    )
+                                    navController.navigate(Routes.Confirmacion.route)
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3A63ED))
