@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.tpi_apps.ui.navigation.BottomNavItem
 import com.example.tpi_apps.ui.theme.AppBlue
@@ -67,11 +68,11 @@ fun BottomNavigationBar(navController: NavController) {
                             onClick = {
                                 if (currentRoute != item.route) {
                                     navController.navigate(item.route) {
-                                        popUpTo(navController.graph.startDestinationId) {
-                                            saveState = true
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = false
                                         }
                                         launchSingleTop = true
-                                        restoreState = true
+                                        restoreState = false
                                     }
                                 }
                             },
@@ -91,7 +92,6 @@ fun BottomNavigationBar(navController: NavController) {
             }
         }
 
-        // Botón de Cámara flotante (sobresale por encima de la barra blanca)
         Box(
             modifier = Modifier
                 .offset(y = (-15.dp))
@@ -103,11 +103,11 @@ fun BottomNavigationBar(navController: NavController) {
                     val camaraRoute = BottomNavItem.Camara.route
                     if (currentRoute != camaraRoute) {
                         navController.navigate(camaraRoute) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = false
                             }
                             launchSingleTop = true
-                            restoreState = true
+                            restoreState = false
                         }
                     }
                 },

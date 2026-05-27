@@ -13,8 +13,11 @@ class FoodRepository {
             Food("4", "Wrap de Pollo", "Shami Shawarma", "Shawarma", 14000.0, 350, 4.0, 67, "Deliciso wrap con salsa spicy", "url"),
             Food("5", "Tallarines a la Pomarola", "La Juvenil", "Pastas", 13500.0, 350, 4.0, 29, "Pasta fresca y salsa muy rica y natural", "url"),
             //Food("6", "Ensalada Caesar", "Green Eat", "Ensaladas", 1800.0, 350, 4.0, 45, "Fresca y natural", "url"),
-            Food("7", "Sushi Roll", "Sushi Club", "Sushi", 15300.0, 400, 4.9, 142, "Salmón fresco y arroz muy dulce", "url"),
+            Food("7", "Sushi Roll", "Sushi Sur", "Sushi", 15300.0, 400, 4.9, 142, "Salmón fresco y arroz muy dulce", "url"),
             Food("8", "Pote de 1kg", "Rapanui", "Postres", 14000.0, 350, 4.0, 105, "Incríble pote de 1kg de chocolate y otros sabores", "url"),
+            Food("9", "Cheescake de Arandanos", "Rapanui", "Postres", 12000.0, 380, 4.5, 75, "Deliciosa porción de cheesecake con arandanos", "url"),
+            Food("10", "Franui", "Rapanui", "Postres", 7600.0, 350, 5.0, 104, "Frambuesas bañadas en chocolate con leche estilo Kinder", "url"),
+            Food("11", "Rigatonis con crema de ajo", "La Juvenil", "Pastas", 9800.0, 350, 4.0, 105, "Abundante plato de fideos con crema de ajo", "url"),
         )
         emit(foods)
     }

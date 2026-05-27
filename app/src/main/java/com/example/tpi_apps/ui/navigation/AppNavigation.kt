@@ -13,6 +13,7 @@ import androidx.compose.animation.core.tween
 import com.example.tpi_apps.ui.screens.CrearReseniaScreen
 import com.example.tpi_apps.ui.screens.ExplorarScreen
 import com.example.tpi_apps.ui.screens.BrandItemsScreen
+import com.example.tpi_apps.ui.screens.ReseniaScreen
 
 @Composable
 fun AppNavigation(
@@ -42,7 +43,7 @@ fun AppNavigation(
             enterTransition = { fadeIn(animationSpec = tween(400)) },
             exitTransition = { fadeOut(animationSpec = tween(400)) }
         ) {
-
+            ReseniaScreen()
         }
         composable(
             Routes.Camara.route,

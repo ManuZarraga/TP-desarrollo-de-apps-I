@@ -49,7 +49,7 @@ fun HomeScreen(
             item {
                 SectionHeader(
                     title = "Realidad vs. Marketing",
-                    onSeeAllClick = onReviewsClick
+                    onSeeAllClick = { navController.navigate("resenia") }
                 )
                 LazyRow(
                     modifier = Modifier

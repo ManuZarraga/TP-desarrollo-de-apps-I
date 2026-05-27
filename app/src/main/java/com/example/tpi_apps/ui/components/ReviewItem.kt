@@ -1,7 +1,9 @@
 package com.example.tpi_apps.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -13,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tpi_apps.R
@@ -21,40 +24,72 @@ import com.example.tpi_apps.data.model.Review
 @Composable
 fun ReviewItem(
     review: Review,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    width: Dp? = 280.dp,
+    onLikeClick: ((String) -> Unit)? = null,
+    isLiked: Boolean = false
 ) {
     Card(
         modifier = modifier
-            .width(280.dp)
-            .padding(start = 16.dp, end = 4.dp),
+            .let { if (width != null) it.width(width) else it.fillMaxWidth() }
+            .padding(horizontal = if (width == null) 16.dp else 0.dp)
+            .padding(start = if (width != null) 16.dp else 0.dp, end = if (width != null) 4.dp else 0.dp, bottom = 12.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
             val imageRes = when {
-                review.itemName.contains("Big Mac", ignoreCase = true) -> R.drawable.review_card_bigmac
+                review.itemName.contains("Big Mac", ignoreCase = true) || review.itemName.contains("Stacker", ignoreCase = true) -> R.drawable.review_card_bigmac
                 review.itemName.contains("Pizza", ignoreCase = true) -> R.drawable.review_card_pizza
+                review.itemName.contains("Sushi", ignoreCase = true) -> R.drawable.review_card_sushi
+                review.itemName.contains("Franui", ignoreCase = true) -> R.drawable.review_card_franui
+                review.itemName.contains("Shawarma", ignoreCase = true) -> R.drawable.review_card_shawarma
+                review.itemName.contains("Postre", ignoreCase = true) || review.itemName.contains("Helado", ignoreCase = true) -> R.drawable.review_card_postre
+                review.restaurantName.contains("Juvenil", ignoreCase = true) -> R.drawable.review_card_pastas2
                 else -> R.drawable.review_card_pastas
             }
 
-            Image(
-                painter = painterResource(id = imageRes),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
-                contentScale = ContentScale.Crop
-            )
+            Box {
+                Image(
+                    painter = painterResource(id = imageRes),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(130.dp)
+                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+                    contentScale = ContentScale.Crop
+                )
+
+                if (onLikeClick != null) {
+                    IconButton(
+                        onClick = { onLikeClick(review.id) },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(12.dp)
+                            .size(32.dp)
+                            .background(Color.White.copy(alpha = 0.8f), CircleShape)
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = if (isLiked) R.drawable.heart_selected else R.drawable.heart_unselected
+                            ),
+                            contentDescription = "Like",
+                            tint = if (isLiked) Color(0xFF3A63ED) else Color.Gray,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
             
-            Column(modifier = Modifier.padding(12.dp)) {
+            Column(modifier = Modifier.padding(10.dp)) {
                 Text(
                     text = "${review.restaurantName}: ${review.itemName}",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
+                        fontSize = 15.sp
                     ),
+                    modifier = Modifier.fillMaxWidth(),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = Color.Black
@@ -62,64 +97,89 @@ fun ReviewItem(
                 
                 Spacer(modifier = Modifier.height(4.dp))
                 
-                // Stars
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    repeat(5) { index ->
-                        val isSelected = index < review.rating
-                        Icon(
-                            painter = painterResource(
-                                id = if (isSelected) R.drawable.star_selected else R.drawable.star_unselected
-                            ),
-                            contentDescription = null,
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
+                // Stars & Likes
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        repeat(5) { index ->
+                            val isSelected = index < review.rating
+                            Icon(
+                                painter = painterResource(
+                                    id = if (isSelected) R.drawable.star_selected else R.drawable.star_unselected
+                                ),
+                                contentDescription = null,
+                                tint = Color.Unspecified,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(2.dp))
+                        }
+                    }
+
+                    if (review.likes > 0) {
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.heart_selected),
+                                contentDescription = null,
+                                tint = Color(0xFF3A63ED),
+                                modifier = Modifier.size(14.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "${review.likes}",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Gray
+                            )
+                        }
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // Date
+                Spacer(modifier = Modifier.height(6.dp))
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.calendar),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = review.date,
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.calendar),
+                            contentDescription = null,
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = review.date,
+                            fontSize = 11.sp,
+                            color = Color.Gray
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.width(10.dp))
+                    
+                    // Time
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.clock),
+                            contentDescription = null,
+                            tint = Color.Unspecified,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${review.time} PM",
+                            fontSize = 11.sp,
+                            color = Color.Gray
+                        )
+                    }
                 }
                 
-                Spacer(modifier = Modifier.height(4.dp))
-                
-                // Time
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.clock),
-                        contentDescription = null,
-                        tint = Color.Unspecified,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "${review.time} PM",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 
                 Text(
                     text = "\"${review.comment}\"",
                     style = MaterialTheme.typography.bodySmall.copy(
-                        fontSize = 13.sp,
+                        fontSize = 11.sp,
                         color = Color.Gray
                     ),
                     maxLines = 1,

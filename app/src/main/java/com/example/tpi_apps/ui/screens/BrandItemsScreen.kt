@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tpi_apps.R
 import com.example.tpi_apps.data.model.Food
 import com.example.tpi_apps.logic.BrandItemsViewModel
+import com.example.tpi_apps.ui.components.BrandFoodItem
 
 @Composable
 fun BrandItemsScreen(
@@ -137,7 +138,7 @@ fun BrandItemsScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(foods) { food ->
-                        BrandFoodCard(food = food)
+                        BrandFoodItem(food = food)
                     }
                 }
             }
@@ -145,106 +146,3 @@ fun BrandItemsScreen(
     }
 }
 
-@Composable
-fun BrandFoodCard(food: Food) {
-    var isLiked by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = food.name,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 4.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.star_selected),
-                            contentDescription = null,
-                            tint = Color.Unspecified,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "${food.rating} · ${food.restaurant} · $$$",
-                            fontSize = 13.sp,
-                            color = Color.Gray
-                        )
-                    }
-                }
-                
-                Icon(
-                    painter = painterResource(
-                        id = if (isLiked) R.drawable.heart_selected else R.drawable.heart_unselected
-                    ),
-                    contentDescription = "Like",
-                    tint = Color.Unspecified,
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clickable { isLiked = !isLiked }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(160.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.review_card_bigmac),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .weight(1.5f)
-                        .fillMaxHeight()
-                        .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop
-                )
-
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.review_card_bigmac),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                    Image(
-                        painter = painterResource(id = R.drawable.review_card_bigmac),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-            }
-        }
-    }
-}
