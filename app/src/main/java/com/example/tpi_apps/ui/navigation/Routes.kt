@@ -1,6 +1,7 @@
 package com.example.tpi_apps.ui.navigation
 
 sealed class Routes(val route: String) {
+    object Onboarding : Routes("onboarding")
     object Inicio : Routes("inicio")
     object Resenia : Routes("resenia")
     object Camara : Routes("camara")

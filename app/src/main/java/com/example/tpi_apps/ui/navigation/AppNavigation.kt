@@ -17,6 +17,7 @@ import com.example.tpi_apps.ui.screens.ReseniaScreen
 import com.example.tpi_apps.ui.screens.ConfirmationScreen
 import com.example.tpi_apps.ui.screens.ReseniaListScreen
 import com.example.tpi_apps.ui.screens.ReseniaSpecificScreen
+import com.example.tpi_apps.ui.screens.OnboardingScreen
 
 @Composable
 fun AppNavigation(
@@ -26,9 +27,22 @@ fun AppNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.Inicio.route,
+        startDestination = Routes.Onboarding.route,
         modifier = modifier
     ) {
+        composable(
+            Routes.Onboarding.route,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) }
+        ) {
+            OnboardingScreen(
+                onFinish = {
+                    navController.navigate(Routes.Inicio.route) {
+                        popUpTo(Routes.Onboarding.route) { inclusive = true }
+                    }
+                }
+            )
+        }
         composable(
             Routes.Inicio.route,
             enterTransition = { fadeIn(animationSpec = tween(400)) },
