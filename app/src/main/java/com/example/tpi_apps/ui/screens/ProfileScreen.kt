@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -23,14 +25,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tpi_apps.data.model.User
 import androidx.compose.material.icons.filled.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.tpi_apps.data.repository.ReviewRepository
+import com.example.tpi_apps.logic.ReviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     user: User,
-    onSettingsClick: () -> Unit,
     onReviewsClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSettingsClick: () -> Unit
 ) {
     val nextLevelPoints = 500
     val progressPercent = (user.points.toFloat() / nextLevelPoints).coerceIn(0f, 1f)
@@ -43,6 +49,7 @@ fun ProfileScreen(
     val openSettings = {
         showEditDialog = true
     }
+    val userReviews by viewModel<ReviewViewModel>().userReviews.collectAsStateWithLifecycle()
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -56,7 +63,7 @@ fun ProfileScreen(
             ))
             .padding(16.dp)
     ) {
-        // --- BOX 1: INFO DE PERFIL BENTO ---
+
         Card(
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -99,10 +106,9 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // --- ENLACE BENTO GRID FILA 1: PUNTOS Y RANGO ---
+
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
 
-            // --- BOX 2: CANASTA DE PUNTOS REESTRUCTURADA ---
             Card(
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent),
@@ -144,7 +150,6 @@ fun ProfileScreen(
                 }
             }
 
-            // --- BOX 3: NIVEL DE CRÍTICO REESTRUCTURADO ---
             val isGold = user.level.contains("Oro") || user.level.contains("Súper")
             Card(
                 shape = RoundedCornerShape(20.dp),
@@ -209,42 +214,57 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // --- ENLACE BENTO GRID FILA 2: REPUTACIÓN Y RESEÑAS ---
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-
-            // --- BOX 4: CARD DE REPUTACIÓN ---
-            Card(
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                modifier = Modifier.weight(1f).height(104.dp).border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(20.dp))
-            ) {
-                Column(modifier = Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.SpaceBetween) {
-                    Text("Reputación ★", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF94A3B8))
-                    Row {
-                        Text(text = String.format("%.1f", user.reputation), fontSize = 24.sp, fontWeight = FontWeight.Black, color = Color(0xFF1E293B), modifier = Modifier.alignByBaseline())
-                        Text(" /5.0", fontSize = 9.sp, color = Color(0xFF64748B), modifier = Modifier.alignByBaseline())
-                    }
-                    Text("Valoración media de tus críticas.", fontSize = 8.sp, color = Color(0xFF64748B), lineHeight = 10.sp)
-                }
-            }
-
-            // --- BOX 5: CARD DE RESEÑAS HISTORIAL ---
             Card(
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 modifier = Modifier.weight(1f).height(104.dp)
-                    .border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(20.dp))
+                    .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(20.dp))
+            ) {
+                Column(modifier = Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.SpaceBetween) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("REPUTACIÓN", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF94A3B8), letterSpacing = 0.8.sp)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("★", fontSize = 10.sp, color = Color(0xFFF59E0B))
+                    }
+                    Row {
+                        Text(
+                            text = String.format("%.1f", user.reputation),
+                            fontSize = 28.sp, fontWeight = FontWeight.Black,
+                            color = Color(0xFF1E293B),
+                            modifier = Modifier.alignByBaseline()
+                        )
+                        Text(
+                            "/5.0",
+                            fontSize = 11.sp, color = Color(0xFF64748B),
+                            modifier = Modifier.alignByBaseline()
+                        )
+                    }
+                    Text("Valoración media de tus reseñas", fontSize = 8.sp, color = Color(0xFF94A3B8))
+                }
+            }
+
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                modifier = Modifier.weight(1f).height(104.dp)
+                    .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(20.dp))
                     .clickable {
                         subTab = "reviews"
                         onReviewsClick()
                     }
             ) {
                 Column(modifier = Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.SpaceBetween) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "Reseñas Creadas", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF94A3B8))
-                        Text(text = "↗", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2563EB))
-                    }
-                    Text("${user.reviewCount}", fontSize = 24.sp, fontWeight = FontWeight.Black, color = Color(0xFF1E293B))
+                    Text(
+                        text = "RESEÑAS CREADAS",
+                        fontSize = 9.sp, fontWeight = FontWeight.Bold,
+                        color = Color(0xFF94A3B8), letterSpacing = 0.8.sp
+                    )
+                    Text(
+                        "${user.reviewCount}",
+                        fontSize = 28.sp, fontWeight = FontWeight.Black,
+                        color = Color(0xFF1E293B)
+                    )
                     Text("Ver historial >", fontSize = 8.5.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2563EB))
                 }
             }
@@ -317,7 +337,7 @@ fun ProfileScreen(
                             Text("Canjeable en 'El Trompo Dorado'. Válido por 3 tacos al pastor.", fontSize = 9.sp, color = Color(0xFF64748B))
                         }
                         Button(
-                            onClick = {},
+                            onClick = onSettingsClick,
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF59E0B), contentColor = Color.White),
                             contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
@@ -348,7 +368,7 @@ fun ProfileScreen(
                             Text("Válido en la compra de pizza familiar. Canjea -400 pts.", fontSize = 9.sp, color = Color(0xFF64748B))
                         }
                         Button(
-                            onClick = {},
+                            onClick = onSettingsClick,
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF59E0B), contentColor = Color.White),
                             contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
@@ -363,86 +383,96 @@ fun ProfileScreen(
                 "reviews" -> {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("Tus Reseñas Recientes", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF475569))
-
-                // Review Item 1
                 Card(
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
                     modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(16.dp)).padding(12.dp)
                 ) {
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("El Trompo Dorado", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("★", fontSize = 11.sp, color = Color(0xFFF59E0B))
-                                Spacer(modifier = Modifier.width(2.dp))
-                                Text("4.5", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFF475569))
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text("Excelente sazón y los tacos de pastor están riquísimos. Muy recomendados.", fontSize = 9.5.sp, color = Color(0xFF475569))
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("23/05/2026 • 20:30", fontSize = 8.sp, color = Color(0xFF94A3B8), fontFamily = FontFamily.Monospace)
-                            Text(
-                                "👍 14 Likes",
-                            fontSize = 8.5.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF475569),
-                            modifier = Modifier.background(Color(0xFFF1F5F9), RoundedCornerShape(4.dp)).padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
-                    }
-                }
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(userReviews) { review ->
+                            Card(
+                                shape = RoundedCornerShape(16.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(16.dp))
+                                    .padding(12.dp)
+                            ) {
+                                Column {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            review.restaurantName,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF1E293B)
+                                        )
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            repeat(review.rating) {
+                                                Text("★", fontSize = 11.sp, color = Color(0xFFF59E0B))
+                                            }
+                                            Spacer(modifier = Modifier.width(2.dp))
+                                            Text(
+                                                "${review.rating}.0",
+                                                fontSize = 10.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = Color(0xFF475569)
+                                            )
+                                        }
+                                    }
 
-                // Review Item 2
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(16.dp)).padding(12.dp)
-                ) {
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("Bella Italia Ristorante", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("★", fontSize = 11.sp, color = Color(0xFFF59E0B))
-                                Spacer(modifier = Modifier.width(2.dp))
-                                Text("5.0", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFF475569))
+                                    Spacer(modifier = Modifier.height(2.dp))
+
+                                    Text(
+                                        "${review.foodCategory} • ${review.itemName}",
+                                        fontSize = 9.sp,
+                                        color = Color(0xFF94A3B8),
+                                        fontWeight = FontWeight.Medium
+                                    )
+
+                                    Spacer(modifier = Modifier.height(4.dp))
+
+                                    Text(
+                                        review.comment,
+                                        fontSize = 9.5.sp,
+                                        color = Color(0xFF475569)
+                                    )
+
+                                    Spacer(modifier = Modifier.height(6.dp))
+
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            "${review.date} • ${"$"}${"%.0f".format(review.itemPrice)}",
+                                            fontSize = 8.sp,
+                                            color = Color(0xFF94A3B8),
+                                            fontFamily = FontFamily.Monospace
+                                        )
+                                        Text(
+                                            text = "👍 ${review.likes} Likes",
+                                            fontSize = 8.5.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = Color(0xFF475569),
+                                            modifier = Modifier
+                                                .background(Color(0xFFF1F5F9), RoundedCornerShape(4.dp))
+                                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+                                }
                             }
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text("La pasta carbonara es de otro planeta. La atención es sumamente cordial y rápida.", fontSize = 9.5.sp, color = Color(0xFF475569))
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("24/05/2026 • 15:15", fontSize = 8.sp, color = Color(0xFF94A3B8), fontFamily = FontFamily.Monospace)
-                            Text(
-                                text = "👍 8 Likes",
-                            fontSize = 8.5.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF475569),
-                            modifier = Modifier.background(Color(0xFFF1F5F9), RoundedCornerShape(4.dp)).padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
                     }
-                }
             }
-        }
+            }}
         }
         if (showEditDialog) {
             androidx.compose.ui.window.Dialog(onDismissRequest = { showEditDialog = false }) {
@@ -540,7 +570,6 @@ fun ProfileScreen(
                         ) {
                             Button(
                                 onClick = {
-                                    // Aplicar los cambios mediante lambda o asignación directa
                                     showEditDialog = false
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5C7CFA)),
@@ -557,7 +586,9 @@ fun ProfileScreen(
                             }
 
                             Button(
-                                onClick = { showEditDialog = false },
+                                onClick = { showEditDialog = false
+                                          user.name=tempUsername
+                                          user.email=tempEmail},
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5B62)),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.weight(1f),

@@ -2,9 +2,9 @@ package com.example.tpi_apps.data.model
 import java.time.LocalDate
 
 data class User(
-    val name: String,
+    var name: String,
     val username: String,
-    val email: String,
+    var email: String,
     val avatarSeed: String,
     var points: Int,
     var level: String,

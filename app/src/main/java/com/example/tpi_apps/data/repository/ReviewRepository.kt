@@ -15,7 +15,8 @@ class ReviewRepository {
                 itemPrice = 1400.0, 
                 comment = "Llegó en excelente estado, nada corrido y...",
                 date = "2024-04-13",
-                likes = 150
+                likes = 150,
+                username = "Manu Zarraga"
             ),
             Review(
                 restaurantName = "McDonald's", 
@@ -25,7 +26,8 @@ class ReviewRepository {
                 itemPrice = 1200.0, 
                 comment = "Los medallones son chicos y trae poca...",
                 date = "2024-04-12",
-                likes = 80
+                likes = 80,
+                username = "Milagro Gonzales Nuñez"
             ),
             Review(
                 restaurantName = "La Juvenil", 
@@ -35,7 +37,8 @@ class ReviewRepository {
                 itemPrice = 1300.0, 
                 comment = "No vino con tantas almendras, pero muy...",
                 date = "2024-04-11",
-                likes = 210
+                likes = 210,
+                username = "Federico Dip"
             ),
             Review(
                 restaurantName = "Burger King", 
@@ -45,7 +48,8 @@ class ReviewRepository {
                 itemPrice = 1500.0, 
                 comment = "Increíble sabor, la carne muy jugosa.",
                 date = "2024-04-10",
-                likes = 300
+                likes = 300,
+                username = "Federico Dip"
             )
         )
         emit(reviews)

@@ -16,7 +16,8 @@ data class Review(
     val time: String = LocalTime.now().toString().substring(0, 5),
     val foodCategory: String,
     val itemPrice: Double? = null,
-    var likes: Int = 0
+    var likes: Int = 0,
+    var username: String
 ) {
     fun incrementLikes() {
         likes += 1
