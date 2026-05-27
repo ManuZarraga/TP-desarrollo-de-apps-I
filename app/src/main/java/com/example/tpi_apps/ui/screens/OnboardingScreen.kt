@@ -82,7 +82,9 @@ fun OnboardingScreen(onFinish: () -> Unit) {
         )
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -97,7 +99,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
 
             Row(
                 Modifier
-                    .height(100.dp)
+                    .padding(bottom = 32.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
@@ -135,41 +137,49 @@ fun OnboardingScreen(onFinish: () -> Unit) {
 fun OnboardingPageContent(page: OnboardingPage) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(64.dp))
 
         Text(
             text = page.title,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 36.sp,
+            fontWeight = FontWeight.ExtraBold,
             color = Color.White,
             textAlign = TextAlign.Center,
-            lineHeight = 40.sp
+            lineHeight = 44.sp,
+            modifier = Modifier.padding(horizontal = 24.dp)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Text(
             text = page.description,
-            fontSize = 18.sp,
+            fontSize = 19.sp,
             color = Color(0xFF213474),
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 20.dp),
-            fontWeight = FontWeight.Medium
+            modifier = Modifier.padding(horizontal = 40.dp),
+            fontWeight = FontWeight.SemiBold,
+            lineHeight = 26.sp
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        Image(
-            painter = painterResource(id = page.imageRes),
-            contentDescription = null,
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            contentScale = ContentScale.Fit
-        )
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = page.imageRes),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
