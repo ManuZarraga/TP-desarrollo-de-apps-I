@@ -15,6 +15,8 @@ import com.example.tpi_apps.ui.screens.ExplorarScreen
 import com.example.tpi_apps.ui.screens.BrandItemsScreen
 import com.example.tpi_apps.ui.screens.ReseniaScreen
 import com.example.tpi_apps.ui.screens.ConfirmationScreen
+import com.example.tpi_apps.ui.screens.ReseniaListScreen
+import com.example.tpi_apps.ui.screens.ReseniaSpecificScreen
 
 @Composable
 fun AppNavigation(
@@ -71,7 +73,7 @@ fun AppNavigation(
             exitTransition = { fadeOut(animationSpec = tween(400)) }
         ) { backStackEntry ->
             val brandName = backStackEntry.arguments?.getString("brandName") ?: ""
-            BrandItemsScreen(brandName = brandName)
+            BrandItemsScreen(brandName = brandName, navController = navController)
         }
         composable(
             Routes.Perfil.route,
@@ -90,6 +92,23 @@ fun AppNavigation(
             exitTransition = { fadeOut(animationSpec = tween(400)) }
         ) {
             ConfirmationScreen(navController = navController)
+        }
+        composable(
+            Routes.ReseniaList.route,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) }
+        ) { backStackEntry ->
+            val brandName = backStackEntry.arguments?.getString("brandName") ?: ""
+            val itemName = backStackEntry.arguments?.getString("itemName") ?: ""
+            ReseniaListScreen(brandName = brandName, itemName = itemName, navController = navController)
+        }
+        composable(
+            Routes.ReseniaSpecific.route,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) }
+        ) { backStackEntry ->
+            val reviewId = backStackEntry.arguments?.getString("reviewId") ?: ""
+            ReseniaSpecificScreen(reviewId = reviewId, navController = navController)
         }
     }
 }

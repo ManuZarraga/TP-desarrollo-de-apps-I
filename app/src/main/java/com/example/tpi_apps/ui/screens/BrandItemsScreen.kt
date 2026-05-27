@@ -31,9 +31,13 @@ import com.example.tpi_apps.logic.BrandItemsViewModel
 import com.example.tpi_apps.ui.components.BrandFoodItem
 import com.example.tpi_apps.ui.components.ReviewItem
 
+import com.example.tpi_apps.ui.navigation.Routes
+import androidx.navigation.NavController
+
 @Composable
 fun BrandItemsScreen(
     brandName: String,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     val factory = remember(brandName) {
@@ -150,7 +154,12 @@ fun BrandItemsScreen(
                         )
                     }
                     items(foods) { food ->
-                        BrandFoodItem(food = food)
+                        BrandFoodItem(
+                            food = food,
+                            onClick = { brand, item ->
+                                navController.navigate(Routes.ReseniaList.createRoute(brand, item))
+                            }
+                        )
                     }
 
                     if (brandReviews.isNotEmpty()) {
@@ -164,7 +173,13 @@ fun BrandItemsScreen(
                             )
                         }
                         items(brandReviews) { review ->
-                            ReviewItem(review = review, width = null)
+                            ReviewItem(
+                                review = review,
+                                width = null,
+                                modifier = Modifier.clickable {
+                                    navController.navigate(Routes.ReseniaSpecific.createRoute(review.id))
+                                }
+                            )
                         }
                     }
                 }

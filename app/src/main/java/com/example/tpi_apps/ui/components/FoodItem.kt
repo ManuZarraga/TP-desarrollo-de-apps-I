@@ -1,6 +1,7 @@
 package com.example.tpi_apps.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -21,7 +22,9 @@ import com.example.tpi_apps.data.model.Food
 @Composable
 fun FoodItem(
     food: Food,
-    modifier: Modifier = Modifier
+    brandName: String = "McDonald's", // Default for demo
+    modifier: Modifier = Modifier,
+    onClick: ((String, String) -> Unit)? = null
 ) {
     val imageRes = when (food.category) {
         "Hamburguesas" -> R.drawable.food_cell1
@@ -36,7 +39,11 @@ fun FoodItem(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .let { 
+                if (onClick != null) it.clickable { onClick(brandName, food.name) } 
+                else it 
+            },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)

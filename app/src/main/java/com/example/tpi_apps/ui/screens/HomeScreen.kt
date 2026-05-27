@@ -1,6 +1,7 @@
 package com.example.tpi_apps.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -18,6 +19,8 @@ import androidx.navigation.NavController
 import com.example.tpi_apps.data.model.User
 import com.example.tpi_apps.logic.HomeViewModel
 import com.example.tpi_apps.ui.components.*
+
+import com.example.tpi_apps.ui.navigation.Routes
 
 @Composable
 fun HomeScreen(
@@ -58,7 +61,12 @@ fun HomeScreen(
                     contentPadding = PaddingValues(end = 16.dp)
                 ) {
                     items(reviews) { review ->
-                        ReviewItem(review = review)
+                        ReviewItem(
+                            review = review,
+                            modifier = Modifier.clickable {
+                                navController.navigate(Routes.ReseniaSpecific.createRoute(review.id))
+                            }
+                        )
                     }
                 }
             }
@@ -93,7 +101,12 @@ fun HomeScreen(
             }
             
             items(foods) { food ->
-                FoodItem(food = food)
+                FoodItem(
+                    food = food,
+                    onClick = { brand, item ->
+                        navController.navigate(Routes.ReseniaList.createRoute(brand, item))
+                    }
+                )
             }
             
             item {

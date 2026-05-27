@@ -21,7 +21,8 @@ import com.example.tpi_apps.data.model.Food
 @Composable
 fun BrandFoodItem(
     food: Food,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: ((String, String) -> Unit)? = null
 ) {
     var isLiked by remember { mutableStateOf(false) }
     
@@ -51,7 +52,11 @@ fun BrandFoodItem(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 20.dp)
+            .let { 
+                if (onClick != null) it.clickable { onClick(food.restaurant, food.name) }
+                else it
+            },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)

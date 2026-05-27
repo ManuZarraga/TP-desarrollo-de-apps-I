@@ -73,6 +73,18 @@ class ReviewRepository {
         }
     }
 
+    fun updateLikes(reviewId: String) {
+        _reviews.update { currentReviews ->
+            currentReviews.map {
+                if (it.id == reviewId) {
+                    it.copy(likes = it.likes + 1)
+                } else {
+                    it
+                }
+            }
+        }
+    }
+
     companion object {
         @Volatile
         private var INSTANCE: ReviewRepository? = null
