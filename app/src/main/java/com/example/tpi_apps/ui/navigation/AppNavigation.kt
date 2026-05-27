@@ -52,6 +52,7 @@ fun AppNavigation(
         ) {
             CrearReseniaScreen(
                 user = user,
+                navController = navController,
                 onSettingsClick = { /* TODO */ },
                 onReviewsClick = { /* TODO */ }
             )
