@@ -572,6 +572,8 @@ fun ProfileScreen(
                             Button(
                                 onClick = {
                                     showEditDialog = false
+                                    user.name=tempUsername
+                                    user.email=tempEmail
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5C7CFA)),
                                 shape = RoundedCornerShape(12.dp),
@@ -588,8 +590,7 @@ fun ProfileScreen(
 
                             Button(
                                 onClick = { showEditDialog = false
-                                          user.name=tempUsername
-                                          user.email=tempEmail},
+                                          },
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5B62)),
                                 shape = RoundedCornerShape(12.dp),
                                 modifier = Modifier.weight(1f),
