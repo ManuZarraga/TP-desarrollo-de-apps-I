@@ -29,13 +29,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tpi_apps.R
 import com.example.tpi_apps.logic.ReseniaFilter
-import com.example.tpi_apps.logic.ReseniaViewModel
+import com.example.tpi_apps.logic.ReviewViewModel
 import com.example.tpi_apps.ui.components.ReviewItem
 
 @Composable
 fun ReseniaScreen(
     modifier: Modifier = Modifier,
-    viewModel: ReseniaViewModel = viewModel()
+    viewModel: ReviewViewModel = viewModel()
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedFilter by viewModel.selectedFilter.collectAsState()

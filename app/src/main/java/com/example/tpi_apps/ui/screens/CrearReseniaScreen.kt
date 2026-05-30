@@ -76,7 +76,6 @@ fun CrearReseniaScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Botón Volver
             IconButton(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier
@@ -106,7 +105,6 @@ fun CrearReseniaScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
-                    // Restaurante
                     item {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -150,7 +148,6 @@ fun CrearReseniaScreen(
                         }
                     }
 
-                    // Pedido
                     item {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -194,7 +191,6 @@ fun CrearReseniaScreen(
                         }
                     }
 
-                    // Puntuación
                     item {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -217,7 +213,6 @@ fun CrearReseniaScreen(
                         }
                     }
 
-                    // Comentario
                     item {
                         Text(text = "Escribe una reseña:", fontWeight = FontWeight.Bold)
                         OutlinedTextField(
@@ -240,7 +235,6 @@ fun CrearReseniaScreen(
                         )
                     }
 
-                    // Imágenes
                     item {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -283,7 +277,6 @@ fun CrearReseniaScreen(
                         }
                     }
 
-                    // Botones
                     item {
                         Button(
                             onClick = { /* TODO */ },
