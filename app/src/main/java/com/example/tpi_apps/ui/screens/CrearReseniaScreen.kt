@@ -58,18 +58,16 @@ fun CrearReseniaScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF3A63ED), Color(0xFFF8FAFC)),
-                    startY = 0f,
-                    endY = 800f
+                    colors = listOf(Color(0xFF3A63ED), Color(0xFFFFFFFF))
                 )
             )
     ) {
         Image(
             painter = painterResource(id = R.drawable.hero_bg),
             contentDescription = null,
-            modifier = Modifier.fillMaxWidth(),
-            contentScale = ContentScale.FillBounds,
-            alpha = 1f
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            alpha = 0.30f
         )
         Column(
             modifier = Modifier
