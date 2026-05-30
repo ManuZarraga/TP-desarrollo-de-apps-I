@@ -365,7 +365,8 @@ fun TermsAndConditionsScreen(onAccept: () -> Unit) {
                     Text(
                         text = if (isAtBottom) "Aceptar y Continuar" else "Deslizá hasta el final",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        fontSize = 16.sp,
+                        color = Color(0xFFFFFFFF)
                     )
                 }
             }
