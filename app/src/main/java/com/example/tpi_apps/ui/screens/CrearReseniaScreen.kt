@@ -58,25 +58,22 @@ fun CrearReseniaScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF3A63ED), Color(0xFFF8FAFC)),
-                    startY = 0f,
-                    endY = 800f
+                    colors = listOf(Color(0xFF3A63ED), Color(0xFFFFFFFF))
                 )
             )
     ) {
         Image(
             painter = painterResource(id = R.drawable.hero_bg),
             contentDescription = null,
-            modifier = Modifier.fillMaxWidth(),
-            contentScale = ContentScale.FillBounds,
-            alpha = 1f
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            alpha = 0.30f
         )
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Botón Volver
             IconButton(
                 onClick = { navController.popBackStack() },
                 modifier = Modifier
@@ -106,7 +103,6 @@ fun CrearReseniaScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
-                    // Restaurante
                     item {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -150,7 +146,6 @@ fun CrearReseniaScreen(
                         }
                     }
 
-                    // Pedido
                     item {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -194,7 +189,6 @@ fun CrearReseniaScreen(
                         }
                     }
 
-                    // Puntuación
                     item {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
@@ -217,7 +211,6 @@ fun CrearReseniaScreen(
                         }
                     }
 
-                    // Comentario
                     item {
                         Text(text = "Escribe una reseña:", fontWeight = FontWeight.Bold)
                         OutlinedTextField(
@@ -240,7 +233,6 @@ fun CrearReseniaScreen(
                         )
                     }
 
-                    // Imágenes
                     item {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -283,7 +275,6 @@ fun CrearReseniaScreen(
                         }
                     }
 
-                    // Botones
                     item {
                         Button(
                             onClick = { /* TODO */ },
