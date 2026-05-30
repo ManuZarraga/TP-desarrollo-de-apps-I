@@ -199,9 +199,11 @@ fun CrearReseniaScreen(
                             Row {
                                 repeat(5) { index ->
                                     Icon(
-                                        imageVector = if (index < puntuacion) Icons.Filled.Star else Icons.Filled.StarBorder,
+                                        painter = painterResource(
+                                            id = if (index < puntuacion) R.drawable.star_selected else R.drawable.star_unselected
+                                        ),
                                         contentDescription = null,
-                                        tint = if (index < puntuacion) Color(0xFF6366F1) else Color.LightGray,
+                                        tint = Color.Unspecified,
                                         modifier = Modifier
                                             .size(32.dp)
                                             .clickable { puntuacion = index + 1 }

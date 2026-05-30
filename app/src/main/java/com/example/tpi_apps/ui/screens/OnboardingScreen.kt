@@ -260,7 +260,7 @@ fun TermsAndConditionsScreen(onAccept: () -> Unit) {
                         modifier = Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFFEFF6FF)),
+                            .background(Color.White),
                         contentAlignment = Alignment.Center
 
                     ) {
