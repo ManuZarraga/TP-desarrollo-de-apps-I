@@ -32,6 +32,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel()
 ) {
     val reviews by viewModel.reviews.collectAsState()
+    val likedReviewIds by viewModel.likedReviewIds.collectAsState()
     val foods by viewModel.filteredFoods.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -65,7 +66,9 @@ fun HomeScreen(
                             review = review,
                             modifier = Modifier.clickable {
                                 navController.navigate(Routes.ReseniaSpecific.createRoute(review.id))
-                            }
+                            },
+                            onLikeClick = { viewModel.toggleLike(it) },
+                            isLiked = likedReviewIds.contains(review.id)
                         )
                     }
                 }

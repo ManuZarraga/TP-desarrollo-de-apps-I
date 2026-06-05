@@ -22,6 +22,8 @@ class HomeViewModel(
     private val _reviews = MutableStateFlow<List<Review>>(emptyList())
     val reviews: StateFlow<List<Review>> = _reviews.asStateFlow()
 
+    val likedReviewIds: StateFlow<Set<String>> = reviewRepository.likedReviewIds
+
     private val _foods = MutableStateFlow<List<Food>>(emptyList())
     
     private val _selectedCategory = MutableStateFlow("Hamburguesas")
@@ -56,6 +58,10 @@ class HomeViewModel(
                 _reviews.value = it
             }
         }
+    }
+
+    fun toggleLike(reviewId: String) {
+        reviewRepository.toggleLike(reviewId)
     }
 
     fun onCategorySelected(category: String) {

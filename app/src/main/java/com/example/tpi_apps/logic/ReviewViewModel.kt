@@ -31,11 +31,10 @@ class ReviewViewModel(
 
     private val _allReviews = MutableStateFlow<List<Review>>(emptyList())
 
-    private val _likedReviewIds = MutableStateFlow<Set<String>>(emptySet())
-    val likedReviewIds: StateFlow<Set<String>> = _likedReviewIds.asStateFlow()
+    val likedReviewIds: StateFlow<Set<String>> = repository.likedReviewIds
 
     val filteredReviews: StateFlow<List<Review>> = combine(
-        _allReviews, _searchQuery, _selectedFilter, _likedReviewIds
+        _allReviews, _searchQuery, _selectedFilter, likedReviewIds
     ) { reviews, query, filter, likedIds ->
         var result = reviews.filter {
             it.restaurantName.contains(query, ignoreCase = true) ||
@@ -73,12 +72,7 @@ class ReviewViewModel(
     }
 
     fun toggleLike(reviewId: String) {
-        val current = _likedReviewIds.value
-        if (current.contains(reviewId)) {
-            _likedReviewIds.value = current - reviewId
-        } else {
-            _likedReviewIds.value = current + reviewId
-        }
+        repository.toggleLike(reviewId)
     }
 
     fun getUserReviews(username: String): StateFlow<List<Review>> = repository
@@ -109,7 +103,7 @@ class ReviewViewModel(
         )
 
     fun updateLikes(reviewId: String) {
-        repository.updateLikes(reviewId)
+        toggleLike(reviewId)
     }
 
     val userReviews: StateFlow<List<Review>> = repository

@@ -65,6 +65,9 @@ class ReviewRepository {
         )
     ))
 
+    private val _likedReviewIds = MutableStateFlow<Set<String>>(emptySet())
+    val likedReviewIds: StateFlow<Set<String>> = _likedReviewIds.asStateFlow()
+
     fun getReviews(): Flow<List<Review>> = _reviews.asStateFlow()
 
     fun addReview(review: Review) {
@@ -73,11 +76,25 @@ class ReviewRepository {
         }
     }
 
-    fun updateLikes(reviewId: String) {
+    fun toggleLike(reviewId: String) {
+        val currentLiked = _likedReviewIds.value
+        val isLiked = currentLiked.contains(reviewId)
+        
+        if (isLiked) {
+            _likedReviewIds.value = currentLiked - reviewId
+            updateLikes(reviewId, false)
+        } else {
+            _likedReviewIds.value = currentLiked + reviewId
+            updateLikes(reviewId, true)
+        }
+    }
+
+    private fun updateLikes(reviewId: String, increment: Boolean) {
         _reviews.update { currentReviews ->
             currentReviews.map {
                 if (it.id == reviewId) {
-                    it.copy(likes = it.likes + 1)
+                    val newLikes = if (increment) it.likes + 1 else (it.likes - 1).coerceAtLeast(0)
+                    it.copy(likes = newLikes)
                 } else {
                     it
                 }

@@ -1,5 +1,6 @@
 package com.example.tpi_apps.ui.screens
 
+import android.media.MediaPlayer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,6 +37,19 @@ fun ReseniaSpecificScreen(
     viewModel: ReviewViewModel = viewModel()
 ) {
     val review by viewModel.getReviewById(reviewId).collectAsState()
+    val likedReviewIds by viewModel.likedReviewIds.collectAsState()
+    val isLiked = review?.let { likedReviewIds.contains(it.id) } ?: false
+    val context = LocalContext.current
+
+    val playLikeSound = {
+        try {
+            val mp = MediaPlayer.create(context, R.raw.like_sound)
+            mp.setOnCompletionListener { it.release() }
+            mp.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -99,10 +114,16 @@ fun ReseniaSpecificScreen(
                 ProductCard(currentReview)
 
                 // User Review Card
-                UserReviewCard(currentReview, onLikeClick = { viewModel.updateLikes(currentReview.id) })
+                UserReviewCard(currentReview, isLiked)
 
-                // Description Card
-                DescriptionCard()
+                // Description Card (con el botón de Like integrado ahora)
+                DescriptionCard(
+                    isLiked = isLiked,
+                    onLikeClick = {
+                        viewModel.updateLikes(currentReview.id)
+                        if (!isLiked) playLikeSound()
+                    }
+                )
 
                 Spacer(modifier = Modifier.height(80.dp))
             }
@@ -201,7 +222,7 @@ fun ProductCard(review: Review) {
 }
 
 @Composable
-fun UserReviewCard(review: Review, onLikeClick: () -> Unit) {
+fun UserReviewCard(review: Review, isLiked: Boolean) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -301,7 +322,7 @@ fun UserReviewCard(review: Review, onLikeClick: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.heart_selected),
+                        painter = painterResource(id = R.drawable.like_icon),
                         contentDescription = null,
                         tint = Color(0xFF3A63ED),
                         modifier = Modifier.size(20.dp)
@@ -315,30 +336,10 @@ fun UserReviewCard(review: Review, onLikeClick: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
-                        text = "A ${review.likes} usuarios les pareció útil esta reseña",
-                        fontSize = 12.sp,
+                        text = if (isLiked) "Te pareció útil esta reseña" else "A ${review.likes} usuarios les pareció útil esta reseña",
+                        fontSize = 10.sp,
                         color = Color(0xFF64748B)
                     )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = onLikeClick,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3A63ED)),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.heart_selected),
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Me pareció útil", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -346,7 +347,7 @@ fun UserReviewCard(review: Review, onLikeClick: () -> Unit) {
 }
 
 @Composable
-fun DescriptionCard() {
+fun DescriptionCard(isLiked: Boolean, onLikeClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -368,6 +369,33 @@ fun DescriptionCard() {
                 fontSize = 14.sp,
                 color = Color(0xFF64748B)
             )
+            
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = onLikeClick,
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isLiked) Color(0xFFE0E7FF) else Color(0xFF3A63ED)
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.like_icon),
+                        contentDescription = null,
+                        tint = if (isLiked) Color(0xFF3A63ED) else Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = if (isLiked) "Ya no me parece útil" else "Me pareció útil",
+                        color = if (isLiked) Color(0xFF3A63ED) else Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                }
+            }
         }
     }
 }
