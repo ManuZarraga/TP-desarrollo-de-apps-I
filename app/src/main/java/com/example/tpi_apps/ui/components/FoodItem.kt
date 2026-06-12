@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.tpi_apps.R
 import com.example.tpi_apps.data.model.Food
 
@@ -26,7 +27,7 @@ fun FoodItem(
     modifier: Modifier = Modifier,
     onClick: ((String, String) -> Unit)? = null
 ) {
-    val imageRes = when (food.category) {
+    val fallbackImage = when (food.category) {
         "Hamburguesas" -> R.drawable.food_cell1
         "Pizza", "Pizzas" -> R.drawable.food_cell2
         "Shawarma", "Shawarmas" -> R.drawable.food_cell3
@@ -35,6 +36,9 @@ fun FoodItem(
         "Pasta", "Pastas" -> R.drawable.food_cell6
         else -> R.drawable.food_cell1
     }
+
+    val imageUrl = if (food.imageUrl.startsWith("http")) food.imageUrl 
+                   else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/foods/${food.imageUrl}"
 
     Card(
         modifier = modifier
@@ -54,13 +58,15 @@ fun FoodItem(
                 .height(100.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = imageRes),
+            AsyncImage(
+                model = imageUrl,
                 contentDescription = null,
                 modifier = Modifier
                     .size(90.dp)
                     .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                error = painterResource(id = fallbackImage),
+                placeholder = painterResource(id = fallbackImage)
             )
             
             Spacer(modifier = Modifier.width(16.dp))

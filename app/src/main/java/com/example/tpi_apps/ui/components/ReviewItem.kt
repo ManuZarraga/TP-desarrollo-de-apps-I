@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.tpi_apps.R
 import com.example.tpi_apps.data.model.Review
 
@@ -39,7 +40,7 @@ fun ReviewItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
-            val imageRes = when {
+            val fallbackImage = when {
                 review.itemName.contains("Big Mac", ignoreCase = true) || review.itemName.contains("Stacker", ignoreCase = true) -> R.drawable.review_card_bigmac
                 review.itemName.contains("Pizza", ignoreCase = true) -> R.drawable.review_card_pizza
                 review.itemName.contains("Sushi", ignoreCase = true) -> R.drawable.review_card_sushi
@@ -50,15 +51,22 @@ fun ReviewItem(
                 else -> R.drawable.review_card_pastas
             }
 
+            val imageUrl = review.imageUrl?.let {
+                if (it.startsWith("http")) it 
+                else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/reviews/$it"
+            }
+
             Box {
-                Image(
-                    painter = painterResource(id = imageRes),
+                AsyncImage(
+                    model = imageUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(130.dp)
                         .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    error = painterResource(id = fallbackImage),
+                    placeholder = painterResource(id = fallbackImage)
                 )
 
                 if (onLikeClick != null) {

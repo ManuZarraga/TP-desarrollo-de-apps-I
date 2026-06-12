@@ -15,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.tpi_apps.R
 import com.example.tpi_apps.data.model.Food
 
@@ -26,7 +27,7 @@ fun BrandFoodItem(
 ) {
     var isLiked by remember { mutableStateOf(false) }
     
-    val mainImageRes = when {
+    val fallbackMain = when {
         food.name.contains("Big Mac", ignoreCase = true) || food.category.contains("Hamburguesa", ignoreCase = true) -> R.drawable.review_card_bigmac
         food.category.contains("Pizza", ignoreCase = true) -> R.drawable.review_card_pizza
         food.category.contains("Sushi", ignoreCase = true) -> R.drawable.review_card_sushi
@@ -35,18 +36,21 @@ fun BrandFoodItem(
         food.category.contains("Postres", ignoreCase = true) -> R.drawable.review_card_postre
         else -> R.drawable.review_card_pastas
     }
+
+    val mainImageUrl = if (food.imageUrl.startsWith("http")) food.imageUrl 
+                       else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/foods/${food.imageUrl}"
     
     val subImage1 = when {
         food.category.contains("Sushi", ignoreCase = true) -> R.drawable.review_card_sushi2
         food.category.contains("Pasta", ignoreCase = true) -> R.drawable.review_card_pastas2
         food.category.contains("Postres", ignoreCase = true) -> R.drawable.review_card_franui
-        else -> mainImageRes
+        else -> fallbackMain
     }
     
     val subImage2 = when {
         food.category.contains("Hamburguesa", ignoreCase = true) -> R.drawable.food_cell1
         food.category.contains("Pizza", ignoreCase = true) -> R.drawable.food_cell2
-        else -> mainImageRes
+        else -> fallbackMain
     }
 
     Card(
@@ -113,14 +117,16 @@ fun BrandFoodItem(
                     .height(160.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Image(
-                    painter = painterResource(id = mainImageRes),
+                AsyncImage(
+                    model = mainImageUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .weight(1.5f)
                         .fillMaxHeight()
                         .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    error = painterResource(id = fallbackMain),
+                    placeholder = painterResource(id = fallbackMain)
                 )
 
                 Column(

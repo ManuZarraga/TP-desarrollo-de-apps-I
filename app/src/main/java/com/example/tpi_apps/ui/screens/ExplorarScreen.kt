@@ -22,10 +22,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.example.tpi_apps.data.model.Brand
+import com.example.tpi_apps.data.network.SupabaseModule
 import com.example.tpi_apps.logic.ExplorarViewModel
 import com.example.tpi_apps.ui.components.Hero
 import com.example.tpi_apps.ui.components.SectionHeader
+import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun ExplorarScreen(
@@ -35,6 +40,22 @@ fun ExplorarScreen(
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val brands by viewModel.filteredBrands.collectAsState(initial = emptyList())
+
+
+    LaunchedEffect(Unit) {
+        try {
+            val supabaseBrands = withContext(Dispatchers.IO) {
+                SupabaseModule.client.postgrest["brands"]
+                    .select {
+                        order(column = "created_at", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
+                    }
+                    .decodeList<Brand>()
+            }
+            viewModel.setBrands(supabaseBrands)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     Column(
         modifier = modifier
@@ -94,24 +115,36 @@ fun BrandCard(
     brand: Brand,
     onClick: () -> Unit
 ) {
+    val backgroundColor = remember(brand.backgroundColor) {
+        try {
+            if (brand.backgroundColor != null) Color(android.graphics.Color.parseColor(brand.backgroundColor))
+            else Color.White
+        } catch (e: Exception) {
+            Color.White
+        }
+    }
+
+    val imageUrl = "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/brands/${brand.imageRes}"
+
     Surface(
         modifier = Modifier
             .aspectRatio(1f)
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
             .clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
-        color = brand.backgroundColor
+        color = backgroundColor
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Image(
-                painter = painterResource(id = brand.imageRes),
+            AsyncImage(
+                model = if (brand.imageRes?.startsWith("http") == true) brand.imageRes else imageUrl,
                 contentDescription = brand.name,
                 modifier = Modifier
                     .fillMaxSize(0.6f),
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Fit,
+                error = painterResource(id = android.R.drawable.ic_menu_report_image) // Icono de error genérico
             )
         }
     }

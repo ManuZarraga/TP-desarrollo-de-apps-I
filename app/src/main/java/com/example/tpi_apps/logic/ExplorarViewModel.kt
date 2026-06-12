@@ -11,18 +11,12 @@ import kotlinx.coroutines.flow.combine
 
 class ExplorarViewModel : ViewModel() {
 
-    private val _brands = MutableStateFlow(
-        listOf(
-            Brand("McDonald's", R.drawable.mcdonalds, Color(0xFFBD0017)),
-            Brand("Burger King", R.drawable.burgerking, Color(0xFFF5ECDD)),
-            Brand("Sushi Sur", R.drawable.sushisur, Color(0xFFFFFFFF)),
-            Brand("Shami Shawarma", R.drawable.shami_shawarma, Color(0xFFED3237)),
-            Brand("La Juvenil", R.drawable.la_juvenil, Color(0xFFCC0000)),
-            Brand("Subway", R.drawable.subway, Color(0xFF005543)),
-            Brand("Guerrín", R.drawable.guerrin, Color(0xFFFFFFFF)),
-            Brand("Rapanui", R.drawable.rapanui, Color(0xFF3D0739))
-        )
-    )
+    private val _brands = MutableStateFlow<List<Brand>>(emptyList())
+    val brands: StateFlow<List<Brand>> = _brands.asStateFlow()
+
+    fun setBrands(brands: List<Brand>) {
+        _brands.value = brands
+    }
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
