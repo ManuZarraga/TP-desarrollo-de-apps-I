@@ -1,6 +1,5 @@
 package com.example.tpi_apps.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,7 +22,6 @@ import com.example.tpi_apps.data.model.Food
 @Composable
 fun FoodItem(
     food: Food,
-    brandName: String = "McDonald's", // Default for demo
     modifier: Modifier = Modifier,
     onClick: ((String, String) -> Unit)? = null
 ) {
@@ -37,15 +35,18 @@ fun FoodItem(
         else -> R.drawable.food_cell1
     }
 
-    val imageUrl = if (food.imageUrl.startsWith("http")) food.imageUrl 
-                   else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/foods/${food.imageUrl}"
+    val imageUrl = when {
+        food.imageUrl.isNullOrEmpty() -> ""
+        food.imageUrl.startsWith("http") -> food.imageUrl
+        else -> "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/foods/${food.imageUrl}"
+    }
 
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .let { 
-                if (onClick != null) it.clickable { onClick(brandName, food.name) } 
+                if (onClick != null) it.clickable { onClick(food.restaurant, food.name) } 
                 else it 
             },
         shape = RoundedCornerShape(16.dp),
@@ -60,7 +61,7 @@ fun FoodItem(
         ) {
             AsyncImage(
                 model = imageUrl,
-                contentDescription = null,
+                contentDescription = food.name,
                 modifier = Modifier
                     .size(90.dp)
                     .clip(RoundedCornerShape(12.dp)),
@@ -87,7 +88,7 @@ fun FoodItem(
                         color = Color.Black
                     )
                     Text(
-                        text = food.description,
+                        text = food.description ?: "",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.Gray,
                         maxLines = 2,

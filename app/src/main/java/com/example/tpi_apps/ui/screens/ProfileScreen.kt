@@ -440,7 +440,7 @@ fun ProfileScreen(
                                     Spacer(modifier = Modifier.height(4.dp))
 
                                     Text(
-                                        review.comment,
+                                        review.comment ?: "",
                                         fontSize = 9.5.sp,
                                         color = Color(0xFF475569)
                                     )
@@ -453,7 +453,7 @@ fun ProfileScreen(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            "${review.date} • ${"$"}${"%.0f".format(review.itemPrice)}",
+                                            "${review.displayDate} • ${"$"}${"%.0f".format(review.itemPrice ?: 0.0)}",
                                             fontSize = 8.sp,
                                             color = Color(0xFF94A3B8),
                                             fontFamily = FontFamily.Monospace

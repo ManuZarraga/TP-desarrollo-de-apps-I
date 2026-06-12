@@ -39,12 +39,12 @@ class ReviewViewModel(
         var result = reviews.filter {
             it.restaurantName.contains(query, ignoreCase = true) ||
                     it.itemName.contains(query, ignoreCase = true) ||
-                    it.comment.contains(query, ignoreCase = true)
+                    (it.comment?.contains(query, ignoreCase = true) == true)
         }
 
         result = when (filter) {
             ReseniaFilter.TENDENCIAS -> result.sortedByDescending { it.likes }
-            ReseniaFilter.NUEVAS -> result.sortedByDescending { it.date }
+            ReseniaFilter.NUEVAS -> result.sortedByDescending { it.displayDate }
             ReseniaFilter.FAVORITAS -> result.filter { likedIds.contains(it.id) }
         }
 
@@ -72,7 +72,11 @@ class ReviewViewModel(
     }
 
     fun toggleLike(reviewId: String) {
-        repository.toggleLike(reviewId)
+        viewModelScope.launch {
+            // TODO: Obtener el ID real del usuario desde un SessionManager
+            val currentUserId = "usuario_demo"
+            repository.toggleLike(reviewId, currentUserId)
+        }
     }
 
     fun getUserReviews(username: String): StateFlow<List<Review>> = repository

@@ -72,6 +72,12 @@ dependencies {
     implementation(libs.ktor.client.android)
     implementation(libs.kotlinx.serialization.json)
     implementation("io.coil-kt:coil-compose:2.6.0")
+    
+    // Retrofit
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.converter.kotlinx.serialization)
+    implementation(libs.okhttp.logging)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -1,15 +1,15 @@
 package com.example.tpi_apps.data.repository
 
-import com.example.tpi_apps.data.model.Food
+import com.example.tpi_apps.data.model.Brand
 import com.example.tpi_apps.data.network.SupabaseModule
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class FoodRepository {
-    fun getFoods(): Flow<List<Food>> = flow {
+class BrandRepository {
+    fun getBrands(): Flow<List<Brand>> = flow {
         try {
-            val foods = SupabaseModule.apiService.getFoods()
-            emit(foods)
+            val brands = SupabaseModule.apiService.getBrands()
+            emit(brands)
         } catch (e: Exception) {
             e.printStackTrace()
             emit(emptyList())
@@ -18,11 +18,11 @@ class FoodRepository {
 
     companion object {
         @Volatile
-        private var INSTANCE: FoodRepository? = null
+        private var INSTANCE: BrandRepository? = null
 
-        fun getInstance(): FoodRepository {
+        fun getInstance(): BrandRepository {
             return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: FoodRepository().also { INSTANCE = it }
+                INSTANCE ?: BrandRepository().also { INSTANCE = it }
             }
         }
     }

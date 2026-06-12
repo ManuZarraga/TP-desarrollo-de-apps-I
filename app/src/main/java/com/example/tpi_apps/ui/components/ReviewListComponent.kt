@@ -125,7 +125,7 @@ fun ReviewListComponent(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = review.comment,
+                text = review.comment ?: "",
                 fontSize = 14.sp,
                 color = Color(0xFF64748B),
                 maxLines = 2,

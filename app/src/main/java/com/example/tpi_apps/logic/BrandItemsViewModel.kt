@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class BrandItemsViewModel(
     private val brandName: String,
-    private val foodRepository: FoodRepository = FoodRepository(),
+    private val foodRepository: FoodRepository = FoodRepository.getInstance(),
     private val reviewRepository: ReviewRepository = ReviewRepository.getInstance()
 ) : ViewModel() {
 
@@ -26,8 +26,8 @@ class BrandItemsViewModel(
     val filteredFoods: StateFlow<List<Food>> = combine(_foods, _searchQuery) { foods, query ->
         foods.filter { food ->
             val matchesBrand = food.restaurant.contains(brandName, ignoreCase = true)
-            val matchesQuery = food.name.contains(query, ignoreCase = true) || 
-                               food.description.contains(query, ignoreCase = true)
+            val matchesQuery = food.name.contains(query, ignoreCase = true) ||
+                               (food.description?.contains(query, ignoreCase = true) == true)
             matchesBrand && matchesQuery
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -49,7 +49,7 @@ class BrandItemsViewModel(
         viewModelScope.launch {
             reviewRepository.getReviews().collect { allReviews ->
                 _reviews.value = allReviews.filter { 
-                    it.restaurantName.contains(brandName, ignoreCase = true) 
+                    it.restaurantName.contains(brandName, ignoreCase = true)
                 }
             }
         }

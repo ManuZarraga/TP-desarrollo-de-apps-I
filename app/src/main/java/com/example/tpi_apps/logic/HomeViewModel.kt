@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val foodRepository: FoodRepository = FoodRepository(),
+    private val foodRepository: FoodRepository = FoodRepository.getInstance(),
     private val reviewRepository: ReviewRepository = ReviewRepository.getInstance()
 ) : ViewModel() {
 
@@ -36,7 +36,7 @@ class HomeViewModel(
         foods.filter { food ->
             val matchesCategory = food.category == category
             val matchesQuery = food.name.contains(query, ignoreCase = true) || 
-                               food.description.contains(query, ignoreCase = true)
+                               (food.description?.contains(query, ignoreCase = true) == true)
             matchesCategory && matchesQuery
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
@@ -61,7 +61,11 @@ class HomeViewModel(
     }
 
     fun toggleLike(reviewId: String) {
-        reviewRepository.toggleLike(reviewId)
+        viewModelScope.launch {
+            // TODO: Obtener el ID del usuario real desde un SessionManager o AuthRepository
+            val currentUserId = "usuario_demo" 
+            reviewRepository.toggleLike(reviewId, currentUserId)
+        }
     }
 
     fun onCategorySelected(category: String) {

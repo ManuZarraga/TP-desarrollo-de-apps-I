@@ -1,15 +1,13 @@
 package com.example.tpi_apps.data.repository
 
 import com.example.tpi_apps.data.model.Review
+import com.example.tpi_apps.data.network.ReviewLikeRequest
 import com.example.tpi_apps.data.network.SupabaseModule
-import io.github.jan.supabase.postgrest.postgrest
-import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.update
 
 class ReviewRepository {
     private val _likedReviewIds = MutableStateFlow<Set<String>>(emptySet())
@@ -17,11 +15,7 @@ class ReviewRepository {
 
     fun getReviews(): Flow<List<Review>> = flow {
         try {
-            val reviews = SupabaseModule.client.postgrest["reviews"]
-                .select {
-                    order(column = "created_at", order = Order.DESCENDING)
-                }
-                .decodeList<Review>()
+            val reviews = SupabaseModule.apiService.getReviews()
             emit(reviews)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -29,16 +23,31 @@ class ReviewRepository {
         }
     }
 
-    fun toggleLike(reviewId: String) {
+    suspend fun addReview(review: Review): Boolean {
+        return try {
+            // Retrofit enviará automáticamente el objeto JSON con brand_id, food_id, user_id, etc.
+            SupabaseModule.apiService.addReview(review)
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    suspend fun toggleLike(reviewId: String, userId: String) {
         val currentLiked = _likedReviewIds.value
         val isLiked = currentLiked.contains(reviewId)
         
-        if (isLiked) {
-            _likedReviewIds.value = currentLiked - reviewId
-            // TODO: Persistir en Supabase (ej. RPC o trigger)
-        } else {
-            _likedReviewIds.value = currentLiked + reviewId
-            // TODO: Persistir en Supabase (ej. RPC o trigger)
+        try {
+            if (isLiked) {
+                SupabaseModule.apiService.removeLike(reviewId, userId)
+                _likedReviewIds.value = currentLiked - reviewId
+            } else {
+                SupabaseModule.apiService.addLike(ReviewLikeRequest(reviewId, userId))
+                _likedReviewIds.value = currentLiked + reviewId
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

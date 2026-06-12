@@ -31,6 +31,14 @@ import com.example.tpi_apps.data.model.User
 import com.example.tpi_apps.logic.CrearReseniaViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tpi_apps.ui.navigation.Routes
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
+import androidx.compose.runtime.collectAsState
+import kotlinx.coroutines.launch
+import java.io.InputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,16 +50,30 @@ fun CrearReseniaScreen(
     modifier: Modifier = Modifier,
     viewModel: CrearReseniaViewModel = viewModel()
 ) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val brands by viewModel.brands.collectAsState()
+    val foods by viewModel.foods.collectAsState()
+    val uploading by viewModel.uploading.collectAsState()
+
+    var selectedBrandId by remember { mutableStateOf<String?>(null) }
     var restaurante by remember { mutableStateOf("") }
+    var selectedFoodId by remember { mutableStateOf<String?>(null) }
     var pedido by remember { mutableStateOf("") }
     var puntuacion by remember { mutableIntStateOf(0) }
     var comentario by remember { mutableStateOf("") }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    val restaurantes = listOf("Kentucky", "McDonald's", "Burger King", "Mostaza")
-    val pedidos = listOf("Pizza Margarita", "Big Mac", "Whopper", "Mega Stack")
+    val filteredFoods = foods.filter { it.brandId == selectedBrandId }
 
     var expandedRest by remember { mutableStateOf(false) }
     var expandedPedido by remember { mutableStateOf(false) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedImageUri = uri
+    }
 
     Box(
         modifier = modifier
@@ -132,11 +154,14 @@ fun CrearReseniaScreen(
                                     expanded = expandedRest,
                                     onDismissRequest = { expandedRest = false }
                                 ) {
-                                    restaurantes.forEach { selectionOption ->
+                                    brands.forEach { brand ->
                                         DropdownMenuItem(
-                                            text = { Text(selectionOption) },
+                                            text = { Text(brand.name) },
                                             onClick = {
-                                                restaurante = selectionOption
+                                                restaurante = brand.name
+                                                selectedBrandId = brand.id
+                                                pedido = "" // Reset food selection when brand changes
+                                                selectedFoodId = null
                                                 expandedRest = false
                                             }
                                         )
@@ -175,11 +200,12 @@ fun CrearReseniaScreen(
                                     expanded = expandedPedido,
                                     onDismissRequest = { expandedPedido = false }
                                 ) {
-                                    pedidos.forEach { selectionOption ->
+                                    filteredFoods.forEach { food ->
                                         DropdownMenuItem(
-                                            text = { Text(selectionOption) },
+                                            text = { Text(food.name) },
                                             onClick = {
-                                                pedido = selectionOption
+                                                pedido = food.name
+                                                selectedFoodId = food.id
                                                 expandedPedido = false
                                             }
                                         )
@@ -240,15 +266,25 @@ fun CrearReseniaScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.review_card_burger),
-                                contentDescription = null,
+                            Box(
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(150.dp)
-                                    .clip(RoundedCornerShape(8.dp)),
-                                contentScale = ContentScale.Crop
-                            )
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color.LightGray),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (selectedImageUri != null) {
+                                    AsyncImage(
+                                        model = selectedImageUri,
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                } else {
+                                    Icon(Icons.Default.Add, contentDescription = null, tint = Color.Gray)
+                                }
+                            }
                             Column(
                                 modifier = Modifier.weight(1f),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -279,7 +315,7 @@ fun CrearReseniaScreen(
 
                     item {
                         Button(
-                            onClick = { /* TODO */ },
+                            onClick = { launcher.launch("image/*") },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3A63ED).copy(alpha = 0.54f))
@@ -291,22 +327,40 @@ fun CrearReseniaScreen(
                     item {
                         Button(
                             onClick = {
-                                if (restaurante.isNotEmpty() && pedido.isNotEmpty() && puntuacion > 0) {
-                                    viewModel.submitReview(
-                                        user = user,
-                                        restaurantName = restaurante,
-                                        itemName = pedido,
-                                        rating = puntuacion,
-                                        comment = comentario
-                                    )
-                                    navController.navigate(Routes.Confirmacion.route)
+                                if (selectedBrandId != null && selectedFoodId != null && puntuacion > 0) {
+                                    coroutineScope.launch {
+                                        var uploadedUrl: String? = null
+                                        selectedImageUri?.let { uri ->
+                                            val inputStream = context.contentResolver.openInputStream(uri)
+                                            val bytes = inputStream?.readBytes()
+                                            inputStream?.close()
+                                            if (bytes != null) {
+                                                uploadedUrl = viewModel.uploadImage(bytes)
+                                            }
+                                        }
+
+                                        viewModel.submitReview(
+                                            user = user,
+                                            brandId = selectedBrandId!!,
+                                            foodId = selectedFoodId!!,
+                                            rating = puntuacion,
+                                            comment = comentario,
+                                            imageUrl = uploadedUrl
+                                        )
+                                        navController.navigate(Routes.Confirmacion.route)
+                                    }
                                 }
                             },
+                            enabled = !uploading,
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3A63ED))
                         ) {
-                            Text("Subir Reseña", color = Color.White)
+                            if (uploading) {
+                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                            } else {
+                                Text("Subir Reseña", color = Color.White)
+                            }
                         }
                     }
                 }

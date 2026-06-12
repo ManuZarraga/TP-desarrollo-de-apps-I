@@ -4,27 +4,47 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class UserData(val username: String = "")
+
+@Serializable
+data class FoodData(
+    val name: String = "",
+    val category: String = "",
+    val price: Double = 0.0
+)
+
+@Serializable
 data class Review(
-    val id: String,
-    @SerialName("restaurant_name")
-    val restaurantName: String,
-    @SerialName("item_name")
-    val itemName: String,
-    val rating: Int,
-    val comment: String,
+    val id: String = "",
+    @SerialName("user_id")
+    val userId: String? = null,
+    @SerialName("brand_id")
+    val brandId: String? = null,
+    @SerialName("food_id")
+    val foodId: String? = null,
+    val rating: Int = 0,
+    val comment: String? = "",
     @SerialName("image_url")
     val imageUrl: String? = null,
-    val date: String,
-    val time: String,
-    @SerialName("food_category")
-    val foodCategory: String,
-    @SerialName("item_price")
-    val itemPrice: Double? = null,
-    @SerialName("likes_count")
+    @SerialName("review_date")
+    val date: String? = "",
+    @SerialName("review_time")
+    val time: String? = "",
+    @SerialName("likes")
     var likes: Int = 0,
-    val username: String
+    
+    @SerialName("profiles")
+    val profiles: UserData? = null,
+    @SerialName("brands")
+    val brands: BrandName? = null,
+    @SerialName("foods")
+    val foods: FoodData? = null
 ) {
-    fun incrementLikes() {
-        likes += 1
-    }
+    val username: String get() = profiles?.username ?: "Usuario"
+    val restaurantName: String get() = brands?.name ?: "Restaurante"
+    val itemName: String get() = foods?.name ?: "Producto"
+    val foodCategory: String get() = foods?.category ?: ""
+    val itemPrice: Double? get() = foods?.price
+    val displayDate: String get() = date ?: ""
+    val displayTime: String get() = time ?: ""
 }

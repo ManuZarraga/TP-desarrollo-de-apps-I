@@ -1,6 +1,5 @@
 package com.example.tpi_apps.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,25 +11,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.tpi_apps.data.model.Brand
-import com.example.tpi_apps.data.network.SupabaseModule
 import com.example.tpi_apps.logic.ExplorarViewModel
 import com.example.tpi_apps.ui.components.Hero
 import com.example.tpi_apps.ui.components.SectionHeader
-import io.github.jan.supabase.postgrest.postgrest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.example.tpi_apps.ui.navigation.Routes
 
 @Composable
 fun ExplorarScreen(
@@ -39,23 +32,7 @@ fun ExplorarScreen(
     viewModel: ExplorarViewModel = viewModel()
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
-    val brands by viewModel.filteredBrands.collectAsState(initial = emptyList())
-
-
-    LaunchedEffect(Unit) {
-        try {
-            val supabaseBrands = withContext(Dispatchers.IO) {
-                SupabaseModule.client.postgrest["brands"]
-                    .select {
-                        order(column = "created_at", order = io.github.jan.supabase.postgrest.query.Order.DESCENDING)
-                    }
-                    .decodeList<Brand>()
-            }
-            viewModel.setBrands(supabaseBrands)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
+    val brands by viewModel.filteredBrands.collectAsState()
 
     Column(
         modifier = modifier
@@ -101,7 +78,7 @@ fun ExplorarScreen(
                     BrandCard(
                         brand = brand,
                         onClick = {
-                            navController.navigate(com.example.tpi_apps.ui.navigation.Routes.BrandItems.createRoute(brand.name))
+                            navController.navigate(Routes.BrandItems.createRoute(brand.name))
                         }
                     )
                 }
@@ -144,7 +121,7 @@ fun BrandCard(
                 modifier = Modifier
                     .fillMaxSize(0.6f),
                 contentScale = ContentScale.Fit,
-                error = painterResource(id = android.R.drawable.ic_menu_report_image) // Icono de error genérico
+                error = painterResource(id = android.R.drawable.ic_menu_report_image)
             )
         }
     }

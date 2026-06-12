@@ -305,7 +305,7 @@ fun UserReviewCard(review: Review, isLiked: Boolean) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = review.comment,
+                text = review.comment ?: "",
                 fontSize = 14.sp,
                 color = Color(0xFF64748B)
             )
