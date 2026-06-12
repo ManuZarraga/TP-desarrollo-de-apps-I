@@ -64,11 +64,11 @@ fun HomeScreen(
                     items(reviews) { review ->
                         ReviewItem(
                             review = review,
-                            modifier = Modifier.clickable {
-                                navController.navigate(Routes.ReseniaSpecific.createRoute(review.id))
-                            },
                             onLikeClick = { viewModel.toggleLike(it) },
-                            isLiked = likedReviewIds.contains(review.id)
+                            isLiked = likedReviewIds.contains(review.id),
+                            onClick = { reviewId ->
+                                navController.navigate(Routes.ReseniaSpecific.createRoute(reviewId))
+                            }
                         )
                     }
                 }

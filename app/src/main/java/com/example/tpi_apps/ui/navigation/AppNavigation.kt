@@ -60,7 +60,11 @@ fun AppNavigation(
             enterTransition = { fadeIn(animationSpec = tween(400)) },
             exitTransition = { fadeOut(animationSpec = tween(400)) }
         ) {
-            ReseniaScreen()
+            ReseniaScreen(
+                onReviewClick = { reviewId ->
+                    navController.navigate(Routes.ReseniaSpecific.createRoute(reviewId))
+                }
+            )
         }
         composable(
             Routes.Camara.route,
@@ -96,6 +100,7 @@ fun AppNavigation(
         ) {
             ProfileScreen(
                 user = user,
+                navController = navController,
                 onSettingsClick = { /* TODO */ },
                 onReviewsClick = { /* TODO */ }
             )

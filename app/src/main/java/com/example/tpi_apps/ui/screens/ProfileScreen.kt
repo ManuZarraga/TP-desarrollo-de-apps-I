@@ -27,13 +27,16 @@ import com.example.tpi_apps.data.model.User
 import androidx.compose.material.icons.filled.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.tpi_apps.data.repository.ReviewRepository
 import com.example.tpi_apps.logic.ReviewViewModel
+import com.example.tpi_apps.ui.components.ReviewItem
+import com.example.tpi_apps.ui.navigation.Routes
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     user: User,
+    navController: NavController,
     onReviewsClick: () -> Unit,
     modifier: Modifier = Modifier,
     onSettingsClick: () -> Unit
@@ -51,6 +54,8 @@ fun ProfileScreen(
     }
     val viewModel: ReviewViewModel = viewModel()
     val userReviews by viewModel.getUserReviews(user.name).collectAsStateWithLifecycle()
+    val likedReviewIds by viewModel.likedReviewIds.collectAsStateWithLifecycle()
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -316,298 +321,231 @@ fun ProfileScreen(
 
         // --- DYNAMIC ACCORDION CONTENT IN JETPACK COMPOSE ---
         when (subTab) {
-                "points" -> {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                // Reward Item 1
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(16.dp)).padding(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+            "points" -> {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    // Reward Item 1
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(16.dp)).padding(12.dp)
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("🌮", fontSize = 14.sp)
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text("Cupón - Orden de Tacos", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
-                            }
-                            Text("Canjeable en 'El Trompo Dorado'. Válido por 3 tacos al pastor.", fontSize = 9.sp, color = Color(0xFF64748B))
-                        }
-                        Button(
-                            onClick = onSettingsClick,
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF59E0B), contentColor = Color.White),
-                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                            enabled = user.points >= 200
-                        ) {
-                            Text(text = "Canjear (200 pts)", fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-
-                // Reward Item 2
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(16.dp)).padding(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("🍕", fontSize = 14.sp)
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text("Descuento en Ristorante", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
-                            }
-                            Text("Válido en la compra de pizza familiar. Canjea -400 pts.", fontSize = 9.sp, color = Color(0xFF64748B))
-                        }
-                        Button(
-                            onClick = onSettingsClick,
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF59E0B), contentColor = Color.White),
-                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                            enabled = user.points >= 400
-                        ) {
-                            Text("Canjear (400 pts)", fontSize = 9.sp, fontWeight = FontWeight.Bold)
-                        }
-                    }
-                }
-            }
-        }
-                "reviews" -> {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Tus Reseñas Recientes", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF475569))
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(16.dp)).padding(12.dp)
-                ) {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        items(userReviews) { review ->
-                            Card(
-                                shape = RoundedCornerShape(16.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(16.dp))
-                                    .padding(12.dp)
-                            ) {
-                                Column {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            review.restaurantName,
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF1E293B)
-                                        )
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            repeat(review.rating) {
-                                                Text("★", fontSize = 11.sp, color = Color(0xFFF59E0B))
-                                            }
-                                            Spacer(modifier = Modifier.width(2.dp))
-                                            Text(
-                                                "${review.rating}.0",
-                                                fontSize = 10.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = Color(0xFF475569)
-                                            )
-                                        }
-                                    }
-
-                                    Spacer(modifier = Modifier.height(2.dp))
-
-                                    Text(
-                                        "${review.foodCategory} • ${review.itemName}",
-                                        fontSize = 9.sp,
-                                        color = Color(0xFF94A3B8),
-                                        fontWeight = FontWeight.Medium
-                                    )
-
-                                    Spacer(modifier = Modifier.height(4.dp))
-
-                                    Text(
-                                        review.comment ?: "",
-                                        fontSize = 9.5.sp,
-                                        color = Color(0xFF475569)
-                                    )
-
-                                    Spacer(modifier = Modifier.height(6.dp))
-
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            "${review.displayDate} • ${"$"}${"%.0f".format(review.itemPrice ?: 0.0)}",
-                                            fontSize = 8.sp,
-                                            color = Color(0xFF94A3B8),
-                                            fontFamily = FontFamily.Monospace
-                                        )
-                                        Text(
-                                            text = "👍 ${review.likes} Likes",
-                                            fontSize = 8.5.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = Color(0xFF475569),
-                                            modifier = Modifier
-                                                .background(Color(0xFFF1F5F9), RoundedCornerShape(4.dp))
-                                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
-            }}
-        }
-        if (showEditDialog) {
-            androidx.compose.ui.window.Dialog(onDismissRequest = { showEditDialog = false }) {
-                Box(
-                    modifier = Modifier
-                        .width(290.dp)
-                        .clip(RoundedCornerShape(32.dp))
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(Color(0xFF4E71FA), Color(0xFF94ADFE), Color(0xFFF5F7FF))
-                            )
-                        )
-                        .padding(24.dp)
-                ) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        // Username input card style
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(52.dp)
-                                .background(Color.White, RoundedCornerShape(12.dp))
-                                .padding(horizontal = 16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            BasicTextField(
-                                value = tempUsername,
-                                onValueChange = { tempUsername = it },
-                                textStyle = androidx.compose.ui.text.TextStyle(
-                                    color = Color(0xFF334155),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 13.sp,
-                                    textAlign = TextAlign.Center
-                                ),
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                                decorationBox = { innerTextField ->
-                                    if (tempUsername.isEmpty()) {
-                                        Text(
-                                            text = "Nuevo nombre de usuario",
-                                        color = Color(0xFF94A3B8),
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 13.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
-                                    innerTextField()
-                                }
-                            )
-                        }
-
-                        // Email input card style
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(52.dp)
-                                .background(Color.White, RoundedCornerShape(12.dp))
-                                .padding(horizontal = 16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            BasicTextField(
-                                value = tempEmail,
-                                onValueChange = { tempEmail = it },
-                                textStyle = androidx.compose.ui.text.TextStyle(
-                                    color = Color(0xFF334155),
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 13.sp,
-                                    textAlign = TextAlign.Center
-                                ),
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                                decorationBox = { innerTextField ->
-                                    if (tempEmail.isEmpty()) {
-                                        Text(
-                                            text = "Nuevo email",
-                                        color = Color(0xFF94A3B8),
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 13.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
-                                    innerTextField()
-                                }
-                            )
-                        }
-
-                        // Action buttons in a Row
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Button(
-                                onClick = {
-                                    showEditDialog = false
-                                    user.name=tempUsername
-                                    user.email=tempEmail
-                                },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5C7CFA)),
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.weight(1f),
-                                contentPadding = PaddingValues(vertical = 12.dp)
-                            ) {
-                                Text(
-                                    text = "Aplicar",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
-                                )
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("🌮", fontSize = 14.sp)
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("Cupón - Orden de Tacos", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
+                                }
+                                Text("Canjeable en 'El Trompo Dorado'. Válido por 3 tacos al pastor.", fontSize = 9.sp, color = Color(0xFF64748B))
                             }
-
                             Button(
-                                onClick = { showEditDialog = false
-                                          },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5B62)),
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.weight(1f),
-                                contentPadding = PaddingValues(vertical = 12.dp)
+                                onClick = onSettingsClick,
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF59E0B), contentColor = Color.White),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                                enabled = user.points >= 200
                             ) {
-                                Text(
-                                    text = "Cancelar",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
-                                )
+                                Text(text = "Canjear (200 pts)", fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+
+                    // Reward Item 2
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(16.dp)).padding(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text("🍕", fontSize = 14.sp)
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("Descuento en Ristorante", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
+                                }
+                                Text("Válido en la compra de pizza familiar. Canjea -400 pts.", fontSize = 9.sp, color = Color(0xFF64748B))
+                            }
+                            Button(
+                                onClick = onSettingsClick,
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF59E0B), contentColor = Color.White),
+                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                                enabled = user.points >= 400
+                            ) {
+                                Text("Canjear (400 pts)", fontSize = 9.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
                 }
             }
-
+            "reviews" -> {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "Tus Reseñas Recientes",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF475569)
+                    )
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(bottom = 80.dp)
+                    ) {
+                        items(userReviews) { review ->
+                            ReviewItem(
+                                review = review,
+                                width = null, // fillMaxWidth
+                                onLikeClick = { viewModel.toggleLike(it) },
+                                isLiked = likedReviewIds.contains(review.id),
+                                onClick = { reviewId ->
+                                    navController.navigate(Routes.ReseniaSpecific.createRoute(reviewId))
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
-}
+
+    if (showEditDialog) {
+        androidx.compose.ui.window.Dialog(onDismissRequest = { showEditDialog = false }) {
+            Box(
+                modifier = Modifier
+                    .width(290.dp)
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color(0xFF4E71FA), Color(0xFF94ADFE), Color(0xFFF5F7FF))
+                        )
+                    )
+                    .padding(24.dp)
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Username input card style
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                            .background(Color.White, RoundedCornerShape(12.dp))
+                            .padding(horizontal = 16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        BasicTextField(
+                            value = tempUsername,
+                            onValueChange = { tempUsername = it },
+                            textStyle = androidx.compose.ui.text.TextStyle(
+                                color = Color(0xFF334155),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                textAlign = TextAlign.Center
+                            ),
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            decorationBox = { innerTextField ->
+                                if (tempUsername.isEmpty()) {
+                                    Text(
+                                        text = "Nuevo nombre de usuario",
+                                        color = Color(0xFF94A3B8),
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                                innerTextField()
+                            }
+                        )
+                    }
+
+                    // Email input card style
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                            .background(Color.White, RoundedCornerShape(12.dp))
+                            .padding(horizontal = 16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        BasicTextField(
+                            value = tempEmail,
+                            onValueChange = { tempEmail = it },
+                            textStyle = androidx.compose.ui.text.TextStyle(
+                                color = Color(0xFF334155),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp,
+                                textAlign = TextAlign.Center
+                            ),
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            decorationBox = { innerTextField ->
+                                if (tempEmail.isEmpty()) {
+                                    Text(
+                                        text = "Nuevo email",
+                                        color = Color(0xFF94A3B8),
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                                innerTextField()
+                            }
+                        )
+                    }
+
+                    // Action buttons in a Row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                showEditDialog = false
+                                user.name=tempUsername
+                                user.email=tempEmail
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5C7CFA)),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.weight(1f),
+                            contentPadding = PaddingValues(vertical = 12.dp)
+                        ) {
+                            Text(
+                                text = "Aplicar",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp
+                            )
+                        }
+
+                        Button(
+                            onClick = { showEditDialog = false },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5B62)),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.weight(1f),
+                            contentPadding = PaddingValues(vertical = 12.dp)
+                        ) {
+                            Text(
+                                text = "Cancelar",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

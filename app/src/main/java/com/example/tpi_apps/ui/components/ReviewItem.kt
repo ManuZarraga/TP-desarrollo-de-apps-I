@@ -1,6 +1,7 @@
 package com.example.tpi_apps.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,13 +28,15 @@ fun ReviewItem(
     modifier: Modifier = Modifier,
     width: Dp? = 280.dp,
     onLikeClick: ((String) -> Unit)? = null,
-    isLiked: Boolean = false
+    isLiked: Boolean = false,
+    onClick: ((String) -> Unit)? = null
 ) {
     Card(
         modifier = modifier
             .let { if (width != null) it.width(width) else it.fillMaxWidth() }
             .padding(horizontal = if (width == null) 16.dp else 0.dp)
-            .padding(start = if (width != null) 16.dp else 0.dp, end = if (width != null) 4.dp else 0.dp, bottom = 12.dp),
+            .padding(start = if (width != null) 16.dp else 0.dp, end = if (width != null) 4.dp else 0.dp, bottom = 12.dp)
+            .clickable(enabled = onClick != null) { onClick?.invoke(review.id) },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -46,14 +49,21 @@ fun ReviewItem(
                 else -> R.drawable.review_card_pastas
             }
 
-            val imageUrl = review.imageUrl?.let {
-                if (it.startsWith("http")) it 
+            val reviewImageUrl = review.imageUrl?.let {
+                if (it.startsWith("http")) it
                 else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/reviews/$it"
             }
 
+            val foodImageUrl = review.foods?.imageUrl?.let {
+                if (it.startsWith("http")) it
+                else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/foods/$it"
+            }
+
+            val finalImageUrl = reviewImageUrl ?: foodImageUrl
+
             Box {
                 AsyncImage(
-                    model = imageUrl,
+                    model = finalImageUrl,
                     contentDescription = review.itemName,
                     modifier = Modifier
                         .fillMaxWidth()

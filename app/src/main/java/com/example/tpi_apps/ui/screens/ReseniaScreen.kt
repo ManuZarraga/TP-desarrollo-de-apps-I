@@ -31,11 +31,13 @@ import com.example.tpi_apps.R
 import com.example.tpi_apps.logic.ReseniaFilter
 import com.example.tpi_apps.logic.ReviewViewModel
 import com.example.tpi_apps.ui.components.ReviewItem
+import com.example.tpi_apps.ui.navigation.Routes
 
 @Composable
 fun ReseniaScreen(
     modifier: Modifier = Modifier,
-    viewModel: ReviewViewModel = viewModel()
+    viewModel: ReviewViewModel = viewModel(),
+    onReviewClick: (String) -> Unit = {}
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedFilter by viewModel.selectedFilter.collectAsState()
@@ -158,14 +160,14 @@ fun ReseniaScreen(
                         width = null, // To use fillMaxWidth
                         modifier = Modifier.fillMaxWidth(),
                         onLikeClick = { viewModel.toggleLike(it) },
-                        isLiked = likedReviewIds.contains(review.id)
+                        isLiked = likedReviewIds.contains(review.id),
+                        onClick = { onReviewClick(it) }
                     )
                 }
 
-                // Pagination Mockup
-                item {
+                /*item {
                     PaginationSection()
-                }
+                }*/
             }
         }
     }

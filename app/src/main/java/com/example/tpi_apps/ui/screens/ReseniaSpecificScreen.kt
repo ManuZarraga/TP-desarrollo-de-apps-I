@@ -24,8 +24,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.tpi_apps.R
 import com.example.tpi_apps.data.model.Review
 import com.example.tpi_apps.logic.ReviewViewModel
@@ -36,8 +38,8 @@ fun ReseniaSpecificScreen(
     navController: NavController,
     viewModel: ReviewViewModel = viewModel()
 ) {
-    val review by viewModel.getReviewById(reviewId).collectAsState()
-    val likedReviewIds by viewModel.likedReviewIds.collectAsState()
+    val review by remember(reviewId) { viewModel.getReviewById(reviewId) }.collectAsStateWithLifecycle()
+    val likedReviewIds by viewModel.likedReviewIds.collectAsStateWithLifecycle()
     val isLiked = review?.let { likedReviewIds.contains(it.id) } ?: false
     val context = LocalContext.current
 
@@ -118,6 +120,7 @@ fun ReseniaSpecificScreen(
 
                 // Description Card (con el botón de Like integrado ahora)
                 DescriptionCard(
+                    description = currentReview.itemDescription,
                     isLiked = isLiked,
                     onLikeClick = {
                         viewModel.updateLikes(currentReview.id)
@@ -148,19 +151,33 @@ fun ProductCard(review: Review) {
                     .height(180.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val imageRes = when {
+                val fallbackImage = when {
                     review.itemName.contains("Big Mac", ignoreCase = true) || review.itemName.contains("Stacker", ignoreCase = true) -> R.drawable.review_card_bigmac
                     review.itemName.contains("Pizza", ignoreCase = true) -> R.drawable.review_card_pizza
                     review.itemName.contains("Sushi", ignoreCase = true) -> R.drawable.review_card_sushi
                     else -> R.drawable.review_card_pastas
                 }
 
+                val reviewImageUrl = review.imageUrl?.let {
+                    if (it.startsWith("http")) it
+                    else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/reviews/$it"
+                }
+
+                val foodImageUrl = review.foods?.imageUrl?.let {
+                    if (it.startsWith("http")) it
+                    else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/foods/$it"
+                }
+
+                val finalImageUrl = reviewImageUrl ?: foodImageUrl
+
                 Box(modifier = Modifier.weight(1.5f)) {
-                    Image(
-                        painter = painterResource(id = imageRes),
-                        contentDescription = null,
+                    AsyncImage(
+                        model = finalImageUrl,
+                        contentDescription = review.itemName,
                         modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+                        error = painterResource(id = fallbackImage),
+                        placeholder = painterResource(id = fallbackImage)
                     )
                     Box(
                         modifier = Modifier
@@ -174,17 +191,21 @@ fun ProductCard(review: Review) {
                 }
                 
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                   Image(
-                       painter = painterResource(id = imageRes),
-                       contentDescription = null,
-                       modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(12.dp)),
-                       contentScale = ContentScale.Crop
-                   )
-                    Image(
-                        painter = painterResource(id = imageRes),
+                    AsyncImage(
+                        model = finalImageUrl,
                         contentDescription = null,
                         modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+                        error = painterResource(id = fallbackImage),
+                        placeholder = painterResource(id = fallbackImage)
+                    )
+                    AsyncImage(
+                        model = finalImageUrl,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop,
+                        error = painterResource(id = fallbackImage),
+                        placeholder = painterResource(id = fallbackImage)
                     )
                 }
             }
@@ -205,7 +226,7 @@ fun ProductCard(review: Review) {
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
-                    painter = painterResource(id = R.drawable.star_selected),
+                    painter = painterResource(id = R.drawable.verified_icon),
                     contentDescription = null,
                     tint = Color(0xFF3A63ED),
                     modifier = Modifier.size(14.dp)
@@ -347,7 +368,7 @@ fun UserReviewCard(review: Review, isLiked: Boolean) {
 }
 
 @Composable
-fun DescriptionCard(isLiked: Boolean, onLikeClick: () -> Unit) {
+fun DescriptionCard(description: String, isLiked: Boolean, onLikeClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -365,7 +386,7 @@ fun DescriptionCard(isLiked: Boolean, onLikeClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Hamburguesa de 180g de carne 100% vacuna, cebolla morada caramelizada, queso cheddar, lechuga fresca, tomate, salsa especial y pan brioche artesanal.",
+                text = description,
                 fontSize = 14.sp,
                 color = Color(0xFF64748B)
             )

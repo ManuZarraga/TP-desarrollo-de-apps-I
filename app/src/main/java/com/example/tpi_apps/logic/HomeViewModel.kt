@@ -63,7 +63,7 @@ class HomeViewModel(
     fun toggleLike(reviewId: String) {
         viewModelScope.launch {
             // TODO: Obtener el ID del usuario real desde un SessionManager o AuthRepository
-            val currentUserId = "usuario_demo" 
+            val currentUserId = "858f623e-63f6-444f-94d7-46606f2e90f2"
             reviewRepository.toggleLike(reviewId, currentUserId)
         }
     }

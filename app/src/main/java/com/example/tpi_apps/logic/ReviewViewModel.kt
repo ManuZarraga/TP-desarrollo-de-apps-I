@@ -53,6 +53,7 @@ class ReviewViewModel(
 
     init {
         loadReviews()
+        loadUserLikes()
     }
 
     private fun loadReviews() {
@@ -60,6 +61,12 @@ class ReviewViewModel(
             repository.getReviews().collect {
                 _allReviews.value = it
             }
+        }
+    }
+
+    private fun loadUserLikes() {
+        viewModelScope.launch {
+            repository.loadUserLikes("b46a5b6d-9276-47a2-9721-6925000552b7")
         }
     }
 
@@ -73,23 +80,23 @@ class ReviewViewModel(
 
     fun toggleLike(reviewId: String) {
         viewModelScope.launch {
-            // TODO: Obtener el ID real del usuario desde un SessionManager
-            val currentUserId = "usuario_demo"
+            // Usuario de prueba fijo para coincidir con CrearReseniaViewModel
+            val currentUserId = "b46a5b6d-9276-47a2-9721-6925000552b7"
             repository.toggleLike(reviewId, currentUserId)
+            // Recargar reseñas para actualizar el contador de likes de la base de datos
+            loadReviews()
         }
     }
 
-    fun getUserReviews(username: String): StateFlow<List<Review>> = repository
-        .getReviews()
-        .map { reviews -> reviews.filter { it.username == username } }
+    fun getUserReviews(username: String): StateFlow<List<Review>> = _allReviews
+        .map { reviews -> reviews.filter { it.username.contains(username, ignoreCase = true) || it.profiles?.username?.contains(username, ignoreCase = true) == true } }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
 
-    fun getItemReviews(brandName: String, itemName: String): StateFlow<List<Review>> = repository
-        .getReviews()
+    fun getItemReviews(brandName: String, itemName: String): StateFlow<List<Review>> = _allReviews
         .map { reviews -> reviews.filter { it.restaurantName == brandName && it.itemName == itemName } }
         .stateIn(
             scope = viewModelScope,
@@ -97,8 +104,7 @@ class ReviewViewModel(
             initialValue = emptyList()
         )
 
-    fun getReviewById(reviewId: String): StateFlow<Review?> = repository
-        .getReviews()
+    fun getReviewById(reviewId: String): StateFlow<Review?> = _allReviews
         .map { reviews -> reviews.find { it.id == reviewId } }
         .stateIn(
             scope = viewModelScope,
@@ -110,9 +116,8 @@ class ReviewViewModel(
         toggleLike(reviewId)
     }
 
-    val userReviews: StateFlow<List<Review>> = repository
-        .getReviews()
-        .map { reviews -> reviews.filter { it.username == "Federico Dip" } }
+    val userReviews: StateFlow<List<Review>> = _allReviews
+        .map { reviews -> reviews.filter { it.profiles?.username == "federicodip" || it.username == "Federico Dip" } }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

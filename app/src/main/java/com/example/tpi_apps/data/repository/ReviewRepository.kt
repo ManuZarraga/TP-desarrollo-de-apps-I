@@ -1,6 +1,7 @@
 package com.example.tpi_apps.data.repository
 
 import com.example.tpi_apps.data.model.Review
+import com.example.tpi_apps.data.model.ReviewLike
 import com.example.tpi_apps.data.network.ReviewLikeRequest
 import com.example.tpi_apps.data.network.SupabaseModule
 import kotlinx.coroutines.flow.Flow
@@ -34,16 +35,41 @@ class ReviewRepository {
         }
     }
 
+    suspend fun loadUserLikes(userId: String) {
+        try {
+            val likes = SupabaseModule.apiService.getLikes("eq.$userId")
+            _likedReviewIds.value = likes.map { it.reviewId }.toSet()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     suspend fun toggleLike(reviewId: String, userId: String) {
         val currentLiked = _likedReviewIds.value
         val isLiked = currentLiked.contains(reviewId)
         
         try {
+            // 1. Obtener la reseña actual para saber cuántos likes tiene
+            val reviews = SupabaseModule.apiService.getReviews()
+            val review = reviews.find { it.id == reviewId } ?: return
+            
             if (isLiked) {
-                SupabaseModule.apiService.removeLike(reviewId, userId)
+                // 2a. Quitar like de la tabla review_likes
+                SupabaseModule.apiService.removeLike("eq.$reviewId", "eq.$userId")
+                
+                // 3a. Decrementar contador en la tabla reviews
+                val newLikeCount = (review.likes - 1).coerceAtLeast(0)
+                SupabaseModule.apiService.updateReviewLikes("eq.$reviewId", mapOf("likes" to newLikeCount))
+                
                 _likedReviewIds.value = currentLiked - reviewId
             } else {
-                SupabaseModule.apiService.addLike(ReviewLikeRequest(reviewId, userId))
+                // 2b. Añadir like a la tabla review_likes
+                SupabaseModule.apiService.addLike(ReviewLikeRequest(reviewId = reviewId, userId = userId))
+                
+                // 3b. Incrementar contador en la tabla reviews
+                val newLikeCount = review.likes + 1
+                SupabaseModule.apiService.updateReviewLikes("eq.$reviewId", mapOf("likes" to newLikeCount))
+
                 _likedReviewIds.value = currentLiked + reviewId
             }
         } catch (e: Exception) {

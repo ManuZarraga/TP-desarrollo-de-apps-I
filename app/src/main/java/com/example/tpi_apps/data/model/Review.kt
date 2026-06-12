@@ -10,7 +10,10 @@ data class UserData(val username: String = "")
 data class FoodData(
     val name: String = "",
     val category: String = "",
-    val price: Double = 0.0
+    val price: Double = 0.0,
+    val description: String? = "",
+    @SerialName("image_url")
+    val imageUrl: String? = ""
 )
 
 @Serializable
@@ -31,7 +34,7 @@ data class Review(
     @SerialName("review_time")
     val time: String? = "",
     @SerialName("likes")
-    var likes: Int = 0,
+    val likes: Int = 0,
     
     @SerialName("profiles")
     val profiles: UserData? = null,
@@ -45,6 +48,7 @@ data class Review(
     val itemName: String get() = foods?.name ?: "Producto"
     val foodCategory: String get() = foods?.category ?: ""
     val itemPrice: Double? get() = foods?.price
+    val itemDescription: String get() = foods?.description ?: "Sin descripción disponible."
     val displayDate: String get() = date ?: ""
     val displayTime: String get() = time ?: ""
 }
