@@ -59,9 +59,9 @@ class CrearReseniaViewModel : ViewModel() {
         val fileName = "${UUID.randomUUID()}.jpg"
         return try {
             _uploading.value = true
-            val bucket = SupabaseModule.client.storage["review-images"]
+            val bucket = SupabaseModule.client.storage["reviews"]
             bucket.upload(fileName, byteArray)
-            "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/review-images/$fileName"
+            "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/reviews/$fileName"
         } catch (e: Exception) {
             e.printStackTrace()
             null
