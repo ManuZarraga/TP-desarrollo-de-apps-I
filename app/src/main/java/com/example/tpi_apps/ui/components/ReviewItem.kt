@@ -42,13 +42,6 @@ fun ReviewItem(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
-            val fallbackImage = when {
-                review.itemName.contains("Big Mac", ignoreCase = true) -> R.drawable.review_card_bigmac
-                review.itemName.contains("Pizza", ignoreCase = true) -> R.drawable.review_card_pizza
-                review.itemName.contains("Sushi", ignoreCase = true) -> R.drawable.review_card_sushi
-                else -> R.drawable.review_card_pastas
-            }
-
             val reviewImageUrl = review.imageUrl?.let {
                 if (it.startsWith("http")) it
                 else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/reviews/$it"
@@ -69,9 +62,7 @@ fun ReviewItem(
                         .fillMaxWidth()
                         .height(130.dp)
                         .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
-                    contentScale = ContentScale.Crop,
-                    error = painterResource(id = fallbackImage),
-                    placeholder = painterResource(id = fallbackImage)
+                    contentScale = ContentScale.Crop
                 )
 
                 if (onLikeClick != null) {

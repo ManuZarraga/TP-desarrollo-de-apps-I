@@ -151,13 +151,6 @@ fun ProductCard(review: Review) {
                     .height(180.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val fallbackImage = when {
-                    review.itemName.contains("Big Mac", ignoreCase = true) || review.itemName.contains("Stacker", ignoreCase = true) -> R.drawable.review_card_bigmac
-                    review.itemName.contains("Pizza", ignoreCase = true) -> R.drawable.review_card_pizza
-                    review.itemName.contains("Sushi", ignoreCase = true) -> R.drawable.review_card_sushi
-                    else -> R.drawable.review_card_pastas
-                }
-
                 val reviewImageUrl = review.imageUrl?.let {
                     if (it.startsWith("http")) it
                     else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/reviews/$it"
@@ -175,9 +168,7 @@ fun ProductCard(review: Review) {
                         model = finalImageUrl,
                         contentDescription = review.itemName,
                         modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop,
-                        error = painterResource(id = fallbackImage),
-                        placeholder = painterResource(id = fallbackImage)
+                        contentScale = ContentScale.Crop
                     )
                     Box(
                         modifier = Modifier
@@ -195,17 +186,13 @@ fun ProductCard(review: Review) {
                         model = finalImageUrl,
                         contentDescription = null,
                         modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop,
-                        error = painterResource(id = fallbackImage),
-                        placeholder = painterResource(id = fallbackImage)
+                        contentScale = ContentScale.Crop
                     )
                     AsyncImage(
                         model = finalImageUrl,
                         contentDescription = null,
                         modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop,
-                        error = painterResource(id = fallbackImage),
-                        placeholder = painterResource(id = fallbackImage)
+                        contentScale = ContentScale.Crop
                     )
                 }
             }

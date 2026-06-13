@@ -41,7 +41,7 @@ class HomeViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val categories = listOf("Hamburguesas", "Pizza", "Sushi", "Pastas", "Shawarma", "Postres")
+    val categories = listOf("Hamburguesas", "Pizzas", "Sushi", "Pastas", "Shawarma", "Sánguches", "Postres")
 
     init {
         loadData()

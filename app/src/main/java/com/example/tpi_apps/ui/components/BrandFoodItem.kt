@@ -27,33 +27,10 @@ fun BrandFoodItem(
 ) {
     var isLiked by remember { mutableStateOf(false) }
     
-    val fallbackMain = when {
-        food.name.contains("Big Mac", ignoreCase = true) || (food.category?.contains("Hamburguesa", ignoreCase = true) == true) -> R.drawable.review_card_bigmac
-        food.category?.contains("Pizza", ignoreCase = true) == true -> R.drawable.review_card_pizza
-        food.category?.contains("Sushi", ignoreCase = true) == true -> R.drawable.review_card_sushi
-        food.category?.contains("Pasta", ignoreCase = true) == true -> R.drawable.review_card_pastas
-        food.category?.contains("Shawarma", ignoreCase = true) == true -> R.drawable.review_card_shawarma
-        food.category?.contains("Postres", ignoreCase = true) == true -> R.drawable.review_card_postre
-        else -> R.drawable.review_card_pastas
-    }
-
     val mainImageUrl = when {
         food.imageUrl.isNullOrEmpty() -> ""
         food.imageUrl.startsWith("http") -> food.imageUrl
         else -> "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/foods/${food.imageUrl}"
-    }
-    
-    val subImage1 = when {
-        food.category?.contains("Sushi", ignoreCase = true) == true -> R.drawable.review_card_sushi2
-        food.category?.contains("Pasta", ignoreCase = true) == true -> R.drawable.review_card_pastas2
-        food.category?.contains("Postres", ignoreCase = true) == true -> R.drawable.review_card_franui
-        else -> fallbackMain
-    }
-    
-    val subImage2 = when {
-        food.category?.contains("Hamburguesa", ignoreCase = true) == true -> R.drawable.food_cell1
-        food.category?.contains("Pizza", ignoreCase = true) == true -> R.drawable.food_cell2
-        else -> fallbackMain
     }
 
     Card(
@@ -127,9 +104,7 @@ fun BrandFoodItem(
                         .weight(1.5f)
                         .fillMaxHeight()
                         .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop,
-                    error = painterResource(id = fallbackMain),
-                    placeholder = painterResource(id = fallbackMain)
+                    contentScale = ContentScale.Crop
                 )
 
                 Column(
@@ -138,8 +113,8 @@ fun BrandFoodItem(
                         .fillMaxHeight(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = subImage1),
+                    AsyncImage(
+                        model = mainImageUrl,
                         contentDescription = null,
                         modifier = Modifier
                             .weight(1f)
@@ -147,8 +122,8 @@ fun BrandFoodItem(
                             .clip(RoundedCornerShape(8.dp)),
                         contentScale = ContentScale.Crop
                     )
-                    Image(
-                        painter = painterResource(id = subImage2),
+                    AsyncImage(
+                        model = mainImageUrl,
                         contentDescription = null,
                         modifier = Modifier
                             .weight(1f)

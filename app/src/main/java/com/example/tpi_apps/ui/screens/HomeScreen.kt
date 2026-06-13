@@ -85,10 +85,11 @@ fun HomeScreen(
                     items(categories) { category ->
                         val imageRes = when (category) {
                             "Hamburguesas" -> R.drawable.categoria_hamburguesa
-                            "Pizza" -> R.drawable.categoria_pizza
+                            "Pizzas" -> R.drawable.categoria_pizza
                             "Sushi" -> R.drawable.categoria_sushi
                             "Pastas" -> R.drawable.categoria_pasta
                             "Shawarma" -> R.drawable.categoria_shawarma
+                            "Sánguches" -> R.drawable.categoria_sanguche
                             "Postres" -> R.drawable.categoria_helado
                             else -> R.drawable.categoria_hamburguesa // Fallback
                         }
