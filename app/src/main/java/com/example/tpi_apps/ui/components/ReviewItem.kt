@@ -124,7 +124,7 @@ fun ReviewItem(
                         Spacer(modifier = Modifier.width(12.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
-                                painter = painterResource(id = R.drawable.heart_selected),
+                                painter = painterResource(id = R.drawable.like_icon),
                                 contentDescription = null,
                                 tint = Color(0xFF3A63ED),
                                 modifier = Modifier.size(14.dp)

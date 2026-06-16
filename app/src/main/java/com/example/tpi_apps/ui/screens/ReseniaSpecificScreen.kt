@@ -31,6 +31,7 @@ import coil.compose.AsyncImage
 import com.example.tpi_apps.R
 import com.example.tpi_apps.data.model.Review
 import com.example.tpi_apps.logic.ReviewViewModel
+import com.example.tpi_apps.ui.components.ReseniaSpecificSkeleton
 
 @Composable
 fun ReseniaSpecificScreen(
@@ -40,6 +41,7 @@ fun ReseniaSpecificScreen(
 ) {
     val review by remember(reviewId) { viewModel.getReviewById(reviewId) }.collectAsStateWithLifecycle()
     val likedReviewIds by viewModel.likedReviewIds.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val isLiked = review?.let { likedReviewIds.contains(it.id) } ?: false
     val context = LocalContext.current
 
@@ -70,65 +72,89 @@ fun ReseniaSpecificScreen(
             alpha = 0.30f
         )
 
-        review?.let { currentReview ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                // Header
-                Row(
+        if (isLoading) {
+            ReseniaSpecificSkeleton()
+        } else {
+            review?.let { currentReview ->
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .statusBarsPadding()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    IconButton(
-                        onClick = { navController.popBackStack() },
+                    // Header
+                    Row(
                         modifier = Modifier
-                            .background(Color.White, CircleShape)
-                            .size(40.dp)
+                            .fillMaxWidth()
+                            .statusBarsPadding()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = "Back",
-                            tint = Color.Black
-                        )
+                        IconButton(
+                            onClick = { navController.popBackStack() },
+                            modifier = Modifier
+                                .background(Color.White, CircleShape)
+                                .size(40.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                contentDescription = "Back",
+                                tint = Color.Black
+                            )
+                        }
+
+                        IconButton(
+                            onClick = { /* TODO */ },
+                            modifier = Modifier
+                                .background(Color.White, CircleShape)
+                                .size(40.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Options",
+                                tint = Color.Black
+                            )
+                        }
                     }
 
-                    IconButton(
-                        onClick = { /* TODO */ },
-                        modifier = Modifier
-                            .background(Color.White, CircleShape)
-                            .size(40.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Options",
-                            tint = Color.Black
-                        )
-                    }
+                    // Main Content Card
+                    ProductCard(currentReview)
+
+                    // User Review Card
+                    UserReviewCard(currentReview, isLiked)
+
+                    // Description Card
+                    DescriptionCard(
+                        description = currentReview.itemDescription,
+                        isLiked = isLiked,
+                        onLikeClick = {
+                            viewModel.toggleLike(currentReview.id)
+                            if (!isLiked) playLikeSound()
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(80.dp))
                 }
-
-                // Main Content Card
-                ProductCard(currentReview)
-
-                // User Review Card
-                UserReviewCard(currentReview, isLiked)
-
-                // Description Card (con el botón de Like integrado ahora)
-                DescriptionCard(
-                    description = currentReview.itemDescription,
-                    isLiked = isLiked,
-                    onLikeClick = {
-                        viewModel.updateLikes(currentReview.id)
-                        if (!isLiked) playLikeSound()
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(80.dp))
+            } ?: run {
+                // If review not found after loading
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.no_items_photo),
+                        contentDescription = null,
+                        modifier = Modifier.size(200.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Reseña no encontrada",
+                        color = Color.Gray,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                }
             }
         }
     }

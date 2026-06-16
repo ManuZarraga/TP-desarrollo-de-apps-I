@@ -15,6 +15,12 @@ class BrandItemsViewModel(
     private val reviewRepository: ReviewRepository = ReviewRepository.getInstance()
 ) : ViewModel() {
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _currentPage = MutableStateFlow(1)
+    val currentPage: StateFlow<Int> = _currentPage.asStateFlow()
+
     private val _reviews = MutableStateFlow<List<Review>>(emptyList())
     val brandReviews: StateFlow<List<Review>> = _reviews.asStateFlow()
 
@@ -32,17 +38,34 @@ class BrandItemsViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val pagedFoods: StateFlow<List<Food>> = combine(filteredFoods, _currentPage) { foods, page ->
+        val startIndex = (page - 1) * 5
+        val endIndex = minOf(startIndex + 5, foods.size)
+        if (startIndex < foods.size) foods.subList(startIndex, endIndex) else emptyList()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val totalPages: StateFlow<Int> = filteredFoods.map { 
+        val pages = (it.size + 4) / 5
+        if (pages == 0) 1 else pages
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
+
     init {
-        loadFoods()
-        loadReviews()
+        loadData()
     }
 
-    private fun loadFoods() {
+    private fun loadData() {
+        _isLoading.value = true
         viewModelScope.launch {
-            foodRepository.getFoods().collect {
-                _foods.value = it
+            try {
+                foodRepository.getFoods().collect {
+                    _foods.value = it
+                    _isLoading.value = false
+                }
+            } catch (e: Exception) {
+                _isLoading.value = false
             }
         }
+        loadReviews()
     }
 
     private fun loadReviews() {
@@ -57,5 +80,10 @@ class BrandItemsViewModel(
 
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
+        _currentPage.value = 1
+    }
+
+    fun onPageChanged(page: Int) {
+        _currentPage.value = page
     }
 }

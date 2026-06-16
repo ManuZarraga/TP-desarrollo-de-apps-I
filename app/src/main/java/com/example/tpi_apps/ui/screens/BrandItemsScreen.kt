@@ -28,11 +28,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tpi_apps.R
 import com.example.tpi_apps.data.model.Food
 import com.example.tpi_apps.logic.BrandItemsViewModel
-import com.example.tpi_apps.ui.components.BrandFoodItem
-import com.example.tpi_apps.ui.components.ReviewItem
+import com.example.tpi_apps.ui.components.FoodItem
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.foundation.shape.CircleShape
 
 import com.example.tpi_apps.ui.navigation.Routes
 import androidx.navigation.NavController
+import com.example.tpi_apps.ui.components.ReviewListComponentSkeleton
 
 @Composable
 fun BrandItemsScreen(
@@ -50,7 +53,10 @@ fun BrandItemsScreen(
     val viewModel: BrandItemsViewModel = viewModel(factory = factory)
     
     val searchQuery by viewModel.searchQuery.collectAsState()
-    val foods by viewModel.filteredFoods.collectAsState()
+    val foods by viewModel.pagedFoods.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val currentPage by viewModel.currentPage.collectAsState()
+    val totalPages by viewModel.totalPages.collectAsState()
 
     Box(
         modifier = modifier
@@ -77,6 +83,17 @@ fun BrandItemsScreen(
                     .padding(top = 16.dp, start = 20.dp, end = 20.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
                 TextField(
                     value = searchQuery,
                     onValueChange = { viewModel.onSearchQueryChanged(it) },
@@ -85,7 +102,7 @@ fun BrandItemsScreen(
                         .height(54.dp),
                     placeholder = {
                         Text(
-                            text = "Buscar un producto específico",
+                            text = "Buscar en $brandName",
                             color = Color(0xFF94A3B8),
                             fontSize = 14.sp
                         )
@@ -110,18 +127,11 @@ fun BrandItemsScreen(
                     shape = RoundedCornerShape(24.dp),
                     singleLine = true
                 )
-                Spacer(modifier = Modifier.width(12.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.bell_empty),
-                    contentDescription = "Notifications",
-                    tint = Color.White,
-                    modifier = Modifier.size(28.dp)
-                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            if (foods.isEmpty() && searchQuery.isNotEmpty()) {
+            if (!isLoading && foods.isEmpty() && searchQuery.isNotEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -129,7 +139,7 @@ fun BrandItemsScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "no se encuentra \"$searchQuery\" en $brandName",
+                        text = "No se encuentra \"$searchQuery\" en $brandName",
                         color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium,
@@ -137,12 +147,9 @@ fun BrandItemsScreen(
                     )
                 }
             } else {
-                val brandReviews by viewModel.brandReviews.collectAsState()
-
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
                     item {
                         Text(
@@ -153,37 +160,87 @@ fun BrandItemsScreen(
                             modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
                         )
                     }
-                    items(foods) { food ->
-                        BrandFoodItem(
-                            food = food,
-                            onClick = { brand, item ->
-                                navController.navigate(Routes.ReseniaList.createRoute(brand, item))
-                            }
-                        )
-                    }
 
-                    if (brandReviews.isNotEmpty()) {
-                        item {
-                            Text(
-                                text = "Reseñas de la comunidad",
-                                color = Color.White,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+                    if (isLoading) {
+                        items(5) { ReviewListComponentSkeleton() }
+                    } else {
+                        items(foods) { food ->
+                            FoodItem(
+                                food = food,
+                                onClick = { brand, item ->
+                                    navController.navigate(Routes.ReseniaList.createRoute(brand, item))
+                                }
                             )
                         }
-                        items(brandReviews) { review ->
-                            ReviewItem(
-                                review = review,
-                                width = null,
-                                modifier = Modifier.clickable {
-                                    navController.navigate(Routes.ReseniaSpecific.createRoute(review.id))
-                                }
+
+                        item {
+                            PaginationSection(
+                                currentPage = currentPage,
+                                totalPages = totalPages,
+                                onPageSelected = { viewModel.onPageChanged(it) }
                             )
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun PaginationSection(
+    currentPage: Int,
+    totalPages: Int,
+    onPageSelected: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = { if (currentPage > 1) onPageSelected(currentPage - 1) },
+            enabled = currentPage > 1
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = "Previous",
+                tint = if (currentPage > 1) Color(0xFF3A63ED) else Color.Gray
+            )
+        }
+
+        for (page in 1..totalPages) {
+            val isSelected = page == currentPage
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(if (isSelected) Color(0xFF3A63ED) else Color(0xFFE2E8F0))
+                    .clickable { onPageSelected(page) }
+                    .padding(4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = page.toString(),
+                    color = if (isSelected) Color.White else Color(0xFF94A3B8),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            if (page < totalPages) Spacer(modifier = Modifier.width(8.dp))
+        }
+
+        IconButton(
+            onClick = { if (currentPage < totalPages) onPageSelected(currentPage + 1) },
+            enabled = currentPage < totalPages
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = "Next",
+                tint = if (currentPage < totalPages) Color(0xFF3A63ED) else Color.Gray
+            )
         }
     }
 }

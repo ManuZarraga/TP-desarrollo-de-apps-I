@@ -17,12 +17,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.tpi_apps.R
 import com.example.tpi_apps.logic.ReviewViewModel
 import com.example.tpi_apps.ui.components.ReviewListComponent
+import com.example.tpi_apps.ui.components.ReviewListComponentSkeleton
 import com.example.tpi_apps.ui.navigation.Routes
 
 @Composable
@@ -33,6 +36,9 @@ fun ReseniaListScreen(
     viewModel: ReviewViewModel = viewModel()
 ) {
     val reviews by viewModel.getItemReviews(brandName, itemName).collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val currentPage by viewModel.currentPage.collectAsState()
+    val totalPages by viewModel.getTotalPagesForItem(brandName, itemName).collectAsState()
 
     Box(
         modifier = Modifier
@@ -93,17 +99,48 @@ fun ReseniaListScreen(
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
-                items(reviews) { review ->
-                    ReviewListComponent(
-                        review = review,
-                        onClick = {
-                            navController.navigate(Routes.ReseniaSpecific.createRoute(review.id))
+                if (isLoading) {
+                    items(3) { ReviewListComponentSkeleton() }
+                } else if (reviews.isEmpty()) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillParentMaxSize()
+                                .padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.no_items_photo),
+                                contentDescription = null,
+                                modifier = Modifier.size(200.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "No existen reseñas de este producto",
+                                color = Color.Gray,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
                         }
-                    )
-                }
+                    }
+                } else {
+                    items(reviews) { review ->
+                        ReviewListComponent(
+                            review = review,
+                            onClick = {
+                                navController.navigate(Routes.ReseniaSpecific.createRoute(review.id))
+                            }
+                        )
+                    }
 
-                item {
-                    PaginationSection()
+                    item {
+                        PaginationSection(
+                            currentPage = currentPage,
+                            totalPages = totalPages,
+                            onPageSelected = { viewModel.onPageChanged(it) }
+                        )
+                    }
                 }
             }
         }

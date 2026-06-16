@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.tpi_apps.data.model.Brand
 import com.example.tpi_apps.logic.ExplorarViewModel
+import com.example.tpi_apps.ui.components.BrandCardSkeleton
 import com.example.tpi_apps.ui.components.Hero
 import com.example.tpi_apps.ui.components.SectionHeader
 import com.example.tpi_apps.ui.navigation.Routes
@@ -33,6 +34,7 @@ fun ExplorarScreen(
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val brands by viewModel.filteredBrands.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     Column(
         modifier = modifier
@@ -50,7 +52,19 @@ fun ExplorarScreen(
             onSeeAllClick = { /* TODO */ }
         )
 
-        if (brands.isEmpty() && searchQuery.isNotEmpty()) {
+        if (isLoading) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 40.dp),
+                contentPadding = PaddingValues(bottom = 16.dp, top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(28.dp),
+                verticalArrangement = Arrangement.spacedBy(28.dp)
+            ) {
+                items(6) { BrandCardSkeleton() }
+            }
+        } else if (brands.isEmpty() && searchQuery.isNotEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()

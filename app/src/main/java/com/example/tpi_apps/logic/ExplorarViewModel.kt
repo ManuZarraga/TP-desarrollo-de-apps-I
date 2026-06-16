@@ -19,6 +19,9 @@ class ExplorarViewModel(
     private val _brands = MutableStateFlow<List<Brand>>(emptyList())
     val brands: StateFlow<List<Brand>> = _brands.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
@@ -35,9 +38,14 @@ class ExplorarViewModel(
     }
 
     private fun loadBrands() {
+        _isLoading.value = true
         viewModelScope.launch {
-            brandRepository.getBrands().collect {
-                _brands.value = it
+            try {
+                brandRepository.getBrands().collect {
+                    _brands.value = it
+                }
+            } finally {
+                _isLoading.value = false
             }
         }
     }

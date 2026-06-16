@@ -31,6 +31,7 @@ import com.example.tpi_apps.R
 import com.example.tpi_apps.logic.ReseniaFilter
 import com.example.tpi_apps.logic.ReviewViewModel
 import com.example.tpi_apps.ui.components.ReviewItem
+import com.example.tpi_apps.ui.components.ReviewItemSkeleton
 import com.example.tpi_apps.ui.navigation.Routes
 
 @Composable
@@ -41,8 +42,11 @@ fun ReseniaScreen(
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedFilter by viewModel.selectedFilter.collectAsState()
-    val reviews by viewModel.filteredReviews.collectAsState()
+    val reviews by viewModel.pagedReviews.collectAsState()
     val likedReviewIds by viewModel.likedReviewIds.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val currentPage by viewModel.currentPage.collectAsState()
+    val totalPages by viewModel.totalPages.collectAsState()
 
     Box(
         modifier = modifier
@@ -62,7 +66,6 @@ fun ReseniaScreen(
         )
 
         Column(modifier = Modifier.fillMaxSize()) {
-            // Search Header (Similar to BrandItemsScreen)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -154,20 +157,56 @@ fun ReseniaScreen(
                     .fillMaxWidth(),
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
-                items(reviews) { review ->
-                    ReviewItem(
-                        review = review,
-                        width = null, // To use fillMaxWidth
-                        modifier = Modifier.fillMaxWidth(),
-                        onLikeClick = { viewModel.toggleLike(it) },
-                        isLiked = likedReviewIds.contains(review.id),
-                        onClick = { onReviewClick(it) }
-                    )
-                }
+                if (isLoading) {
+                    items(3) { 
+                        ReviewItemSkeleton(
+                            width = null,
+                            modifier = Modifier.fillMaxWidth()
+                        ) 
+                    }
+                } else if (reviews.isEmpty()) {
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .fillParentMaxSize()
+                                .padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.no_items_photo),
+                                contentDescription = null,
+                                modifier = Modifier.size(200.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "No existen reseñas de este producto",
+                                color = Color.Gray,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
+                } else {
+                    items(reviews) { review ->
+                        ReviewItem(
+                            review = review,
+                            width = null, // To use fillMaxWidth
+                            modifier = Modifier.fillMaxWidth(),
+                            onLikeClick = { viewModel.toggleLike(it) },
+                            isLiked = likedReviewIds.contains(review.id),
+                            onClick = { onReviewClick(review.id) }
+                        )
+                    }
 
-                /*item {
-                    PaginationSection()
-                }*/
+                    item {
+                        ReviewPaginationSection(
+                            currentPage = currentPage,
+                            totalPages = totalPages,
+                            onPageSelected = { viewModel.onPageChanged(it) }
+                        )
+                    }
+                }
             }
         }
     }
@@ -201,7 +240,11 @@ fun FilterChipItem(
 }
 
 @Composable
-fun PaginationSection() {
+fun ReviewPaginationSection(
+    currentPage: Int,
+    totalPages: Int,
+    onPageSelected: (Int) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -209,23 +252,26 @@ fun PaginationSection() {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = { /* TODO */ }) {
+        IconButton(
+            onClick = { if (currentPage > 1) onPageSelected(currentPage - 1) },
+            enabled = currentPage > 1
+        ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = "Previous",
-                tint = Color(0xFF3A63ED)
+                tint = if (currentPage > 1) Color(0xFF3A63ED) else Color.Gray
             )
         }
 
-        val pages = listOf(1, 2, 3, 4)
-        pages.forEach { page ->
-            val isSelected = page == 1
+        for (page in 1..totalPages) {
+            val isSelected = page == currentPage
             Box(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
                     .background(if (isSelected) Color(0xFF3A63ED) else Color(0xFFE2E8F0))
-                    .clickable { /* TODO */ },
+                    .clickable { onPageSelected(page) }
+                    .padding(4.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -235,14 +281,17 @@ fun PaginationSection() {
                     fontWeight = FontWeight.Bold
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
+            if (page < totalPages) Spacer(modifier = Modifier.width(8.dp))
         }
 
-        IconButton(onClick = { /* TODO */ }) {
+        IconButton(
+            onClick = { if (currentPage < totalPages) onPageSelected(currentPage + 1) },
+            enabled = currentPage < totalPages
+        ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Next",
-                tint = Color(0xFF3A63ED)
+                tint = if (currentPage < totalPages) Color(0xFF3A63ED) else Color.Gray
             )
         }
     }

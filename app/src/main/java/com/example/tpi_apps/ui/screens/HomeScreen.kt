@@ -13,6 +13,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.CircleShape
 import com.example.tpi_apps.R
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -31,11 +37,14 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel()
 ) {
-    val reviews by viewModel.reviews.collectAsState()
+    val trendingReviews by viewModel.trendingReviews.collectAsState()
     val likedReviewIds by viewModel.likedReviewIds.collectAsState()
-    val foods by viewModel.filteredFoods.collectAsState()
+    val foods by viewModel.paginatedFoods.collectAsState()
+    val currentPage by viewModel.currentPage.collectAsState()
+    val totalPages by viewModel.totalPages.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     val categories = viewModel.categories
 
     Scaffold { innerPadding ->
@@ -61,15 +70,19 @@ fun HomeScreen(
                         .padding(vertical = 8.dp),
                     contentPadding = PaddingValues(end = 16.dp)
                 ) {
-                    items(reviews) { review ->
-                        ReviewItem(
-                            review = review,
-                            onLikeClick = { viewModel.toggleLike(it) },
-                            isLiked = likedReviewIds.contains(review.id),
-                            onClick = { reviewId ->
-                                navController.navigate(Routes.ReseniaSpecific.createRoute(reviewId))
-                            }
-                        )
+                    if (isLoading) {
+                        items(5) { ReviewItemSkeleton() }
+                    } else {
+                        items(trendingReviews) { review ->
+                            ReviewItem(
+                                review = review,
+                                onLikeClick = { viewModel.toggleLike(it) },
+                                isLiked = likedReviewIds.contains(review.id),
+                                onClick = { reviewId ->
+                                    navController.navigate(Routes.ReseniaSpecific.createRoute(reviewId))
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -104,18 +117,90 @@ fun HomeScreen(
                 }
             }
             
-            items(foods) { food ->
-                FoodItem(
-                    food = food,
-                    onClick = { brand, item ->
-                        navController.navigate(Routes.ReseniaList.createRoute(brand, item))
+            if (isLoading) {
+                items(5) { ReviewListComponentSkeleton() }
+            } else {
+                items(foods) { food ->
+                    FoodItem(
+                        food = food,
+                        onClick = { brand, item ->
+                            navController.navigate(Routes.ReseniaList.createRoute(brand, item))
+                        }
+                    )
+                }
+                
+                if (totalPages > 1) {
+                    item {
+                        HomePaginationSection(
+                            currentPage = currentPage + 1,
+                            totalPages = totalPages,
+                            onPageSelected = { viewModel.onPageChanged(it - 1) }
+                        )
                     }
-                )
+                }
             }
             
             item {
                 Spacer(modifier = Modifier.height(16.dp))
             }
+        }
+    }
+}
+
+@Composable
+fun HomePaginationSection(
+    currentPage: Int,
+    totalPages: Int,
+    onPageSelected: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = { if (currentPage > 1) onPageSelected(currentPage - 1) },
+            enabled = currentPage > 1
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = "Previous",
+                tint = if (currentPage > 1) Color(0xFF3A63ED) else Color.Gray
+            )
+        }
+
+        for (page in 1..totalPages) {
+            val isSelected = page == currentPage
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(if (isSelected) Color(0xFF3A63ED) else Color(0xFFE2E8F0))
+                    .clickable { onPageSelected(page) }
+                    .padding(4.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = page.toString(),
+                    color = if (isSelected) Color.White else Color(0xFF94A3B8),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            if (page < totalPages) Spacer(modifier = Modifier.width(8.dp))
+        }
+
+        IconButton(
+            onClick = { if (currentPage < totalPages) onPageSelected(currentPage + 1) },
+            enabled = currentPage < totalPages
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = "Next",
+                tint = if (currentPage < totalPages) Color(0xFF3A63ED) else Color.Gray
+            )
         }
     }
 }

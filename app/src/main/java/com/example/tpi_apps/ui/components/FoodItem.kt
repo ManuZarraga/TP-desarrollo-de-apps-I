@@ -25,16 +25,6 @@ fun FoodItem(
     modifier: Modifier = Modifier,
     onClick: ((String, String) -> Unit)? = null
 ) {
-    val fallbackImage = when (food.category) {
-        "Hamburguesas" -> R.drawable.food_cell1
-        "Pizza", "Pizzas" -> R.drawable.food_cell2
-        "Shawarma", "Shawarmas" -> R.drawable.food_cell3
-        "Sushi", "Sushis" -> R.drawable.food_cell4
-        "Postres", "Postre", "Helado" -> R.drawable.food_cell5
-        "Pasta", "Pastas" -> R.drawable.food_cell6
-        else -> R.drawable.food_cell1
-    }
-
     val imageUrl = when {
         food.imageUrl.isNullOrEmpty() -> ""
         food.imageUrl.startsWith("http") -> food.imageUrl
@@ -65,9 +55,7 @@ fun FoodItem(
                 modifier = Modifier
                     .size(90.dp)
                     .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop,
-                error = painterResource(id = fallbackImage),
-                placeholder = painterResource(id = fallbackImage)
+                contentScale = ContentScale.Crop
             )
             
             Spacer(modifier = Modifier.width(16.dp))

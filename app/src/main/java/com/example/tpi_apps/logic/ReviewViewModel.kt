@@ -22,6 +22,11 @@ class ReviewViewModel(
     private val repository: ReviewRepository = ReviewRepository.getInstance()
 ) : ViewModel()
  {
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _currentPage = MutableStateFlow(1)
+    val currentPage: StateFlow<Int> = _currentPage.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -51,15 +56,28 @@ class ReviewViewModel(
         result
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val pagedReviews: StateFlow<List<Review>> = combine(filteredReviews, _currentPage) { reviews, page ->
+        val startIndex = (page - 1) * 5
+        val endIndex = minOf(startIndex + 5, reviews.size)
+        if (startIndex < reviews.size) reviews.subList(startIndex, endIndex) else emptyList()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val totalPages: StateFlow<Int> = filteredReviews.map { 
+        val pages = (it.size + 4) / 5
+        if (pages == 0) 1 else pages
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
+
     init {
         loadReviews()
         loadUserLikes()
     }
 
     private fun loadReviews() {
+        _isLoading.value = true
         viewModelScope.launch {
             repository.getReviews().collect {
                 _allReviews.value = it
+                _isLoading.value = false
             }
         }
     }
@@ -76,6 +94,11 @@ class ReviewViewModel(
 
     fun onFilterSelected(filter: ReseniaFilter) {
         _selectedFilter.value = filter
+        _currentPage.value = 1
+    }
+
+    fun onPageChanged(page: Int) {
+        _currentPage.value = page
     }
 
     fun toggleLike(reviewId: String) {
@@ -96,14 +119,6 @@ class ReviewViewModel(
             initialValue = emptyList()
         )
 
-    fun getItemReviews(brandName: String, itemName: String): StateFlow<List<Review>> = _allReviews
-        .map { reviews -> reviews.filter { it.restaurantName == brandName && it.itemName == itemName } }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
     fun getReviewById(reviewId: String): StateFlow<Review?> = _allReviews
         .map { reviews -> reviews.find { it.id == reviewId } }
         .stateIn(
@@ -111,6 +126,25 @@ class ReviewViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = null
         )
+
+    fun getItemReviews(brandName: String, itemName: String): StateFlow<List<Review>> = combine(_allReviews, _currentPage) { reviews, page ->
+        val filtered = reviews.filter { it.restaurantName == brandName && it.itemName == itemName }
+        val startIndex = (page - 1) * 5
+        val endIndex = minOf(startIndex + 5, filtered.size)
+        if (startIndex < filtered.size) filtered.subList(startIndex, endIndex) else emptyList()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
+
+    fun getTotalPagesForItem(brandName: String, itemName: String): StateFlow<Int> = _allReviews
+        .map { reviews -> 
+            val count = reviews.count { it.restaurantName == brandName && it.itemName == itemName }
+            val pages = (count + 4) / 5
+            if (pages == 0) 1 else pages
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1)
 
     fun updateLikes(reviewId: String) {
         toggleLike(reviewId)
