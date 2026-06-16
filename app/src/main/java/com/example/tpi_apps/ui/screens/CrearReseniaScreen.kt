@@ -130,6 +130,7 @@ fun CrearReseniaScreen(
                             Text(
                                 text = "Restaurante:",
                                 fontWeight = FontWeight.Bold,
+                                color = Color(0xFF64748B),
                                 modifier = Modifier.width(100.dp)
                             )
                             ExposedDropdownMenuBox(
@@ -146,8 +147,12 @@ fun CrearReseniaScreen(
                                         .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                         .fillMaxWidth(),
                                     shape = RoundedCornerShape(8.dp),
+                                    textStyle = LocalTextStyle.current.copy(color = Color(0xFF3A63ED)),
                                     colors = OutlinedTextFieldDefaults.colors(
-                                        unfocusedBorderColor = Color.LightGray
+                                        focusedBorderColor = Color(0xFF3A63ED),
+                                        unfocusedBorderColor = Color(0xFFCBD5E1),
+                                        focusedTextColor = Color(0xFF3A63ED),
+                                        unfocusedTextColor = Color(0xFF3A63ED)
                                     )
                                 )
                                 ExposedDropdownMenu(
@@ -176,6 +181,7 @@ fun CrearReseniaScreen(
                             Text(
                                 text = "Pedido",
                                 fontWeight = FontWeight.Bold,
+                                color = Color(0xFF64748B),
                                 modifier = Modifier.width(100.dp)
                             )
                             ExposedDropdownMenuBox(
@@ -192,8 +198,12 @@ fun CrearReseniaScreen(
                                         .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                         .fillMaxWidth(),
                                     shape = RoundedCornerShape(8.dp),
+                                    textStyle = LocalTextStyle.current.copy(color = Color(0xFF3A63ED)),
                                     colors = OutlinedTextFieldDefaults.colors(
-                                        unfocusedBorderColor = Color.LightGray
+                                        focusedBorderColor = Color(0xFF3A63ED),
+                                        unfocusedBorderColor = Color(0xFFCBD5E1),
+                                        focusedTextColor = Color(0xFF3A63ED),
+                                        unfocusedTextColor = Color(0xFF3A63ED)
                                     )
                                 )
                                 ExposedDropdownMenu(
@@ -220,6 +230,7 @@ fun CrearReseniaScreen(
                             Text(
                                 text = "Puntuación:",
                                 fontWeight = FontWeight.Bold,
+                                color = Color(0xFF64748B),
                                 modifier = Modifier.width(100.dp)
                             )
                             Row {
@@ -240,7 +251,11 @@ fun CrearReseniaScreen(
                     }
 
                     item {
-                        Text(text = "Escribe una reseña:", fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "Escribe una reseña:",
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF64748B)
+                        )
                         OutlinedTextField(
                             value = comentario,
                             onValueChange = { comentario = it },
@@ -255,8 +270,13 @@ fun CrearReseniaScreen(
                                 .fillMaxWidth()
                                 .height(150.dp),
                             shape = RoundedCornerShape(8.dp),
+                            textStyle = LocalTextStyle.current.copy(color = Color(0xFF3A63ED)),
                             colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedBorderColor = Color.LightGray
+                                focusedBorderColor = Color(0xFF3A63ED),
+                                unfocusedBorderColor = Color(0xFFCBD5E1),
+                                focusedTextColor = Color(0xFF3A63ED),
+                                unfocusedTextColor = Color(0xFF3A63ED),
+                                cursorColor = Color(0xFF3A63ED)
                             )
                         )
                     }

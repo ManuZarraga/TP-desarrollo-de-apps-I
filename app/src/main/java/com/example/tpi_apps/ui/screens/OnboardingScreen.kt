@@ -44,7 +44,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
             R.drawable.onboarding_1
         ),
         OnboardingPage(
-            "Compartí tu\nesperiencia",
+            "Compartí tu\nexperiencia",
             "Reseñá tus pedidos, subí fotos y ayudá a otros a elegir mejor.",
             R.drawable.onboarding_2
         ),

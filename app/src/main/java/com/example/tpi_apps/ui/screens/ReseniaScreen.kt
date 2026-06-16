@@ -94,6 +94,7 @@ fun ReseniaScreen(
                             modifier = Modifier.size(20.dp)
                         )
                     },
+                    textStyle = LocalTextStyle.current.copy(color = Color(0xFF3A63ED)),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.White,
                         unfocusedContainerColor = Color.White,
@@ -101,7 +102,9 @@ fun ReseniaScreen(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
-                        cursorColor = Color(0xFF3A63ED)
+                        cursorColor = Color(0xFF3A63ED),
+                        focusedTextColor = Color(0xFF3A63ED),
+                        unfocusedTextColor = Color(0xFF3A63ED)
                     ),
                     shape = RoundedCornerShape(24.dp),
                     singleLine = true
