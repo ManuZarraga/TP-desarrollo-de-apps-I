@@ -100,9 +100,7 @@ fun AppNavigation(
         ) {
             ProfileScreen(
                 user = user,
-                navController = navController,
-                onSettingsClick = { /* TODO */ },
-                onReviewsClick = { /* TODO */ }
+                navController = navController
             )
         }
         composable(

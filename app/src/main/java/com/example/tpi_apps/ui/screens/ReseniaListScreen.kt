@@ -27,6 +27,7 @@ import com.example.tpi_apps.logic.ReviewViewModel
 import com.example.tpi_apps.ui.components.ReviewListComponent
 import com.example.tpi_apps.ui.components.ReviewListComponentSkeleton
 import com.example.tpi_apps.ui.navigation.Routes
+import com.example.tpi_apps.ui.components.PaginationSection
 
 @Composable
 fun ReseniaListScreen(

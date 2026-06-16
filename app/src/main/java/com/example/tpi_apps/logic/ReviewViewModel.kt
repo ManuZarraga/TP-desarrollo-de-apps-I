@@ -103,11 +103,11 @@ class ReviewViewModel(
 
     fun toggleLike(reviewId: String) {
         viewModelScope.launch {
-            // Usuario de prueba fijo para coincidir con CrearReseniaViewModel
             val currentUserId = "b46a5b6d-9276-47a2-9721-6925000552b7"
             repository.toggleLike(reviewId, currentUserId)
-            // Recargar reseñas para actualizar el contador de likes de la base de datos
-            loadReviews()
+            repository.getReviews().collect {
+                _allReviews.value = it
+            }
         }
     }
 

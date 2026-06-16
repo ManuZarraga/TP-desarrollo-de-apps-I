@@ -133,10 +133,9 @@ fun ReseniaSpecificScreen(
                         }
                     )
 
-                    Spacer(modifier = Modifier.height(80.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             } ?: run {
-                // If review not found after loading
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,

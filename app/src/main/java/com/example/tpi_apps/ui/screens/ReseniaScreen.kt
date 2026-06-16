@@ -183,7 +183,7 @@ fun ReseniaScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "No existen reseñas de este producto",
+                                text = if (selectedFilter == ReseniaFilter.FAVORITAS) "No tienes reseñas favoritas" else "No existen reseñas de este producto",
                                 color = Color.Gray,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
