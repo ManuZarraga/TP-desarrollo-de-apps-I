@@ -65,7 +65,7 @@ fun BrandFoodItem(
                         Icon(
                             painter = painterResource(id = R.drawable.star_selected),
                             contentDescription = null,
-                            tint = Color.Unspecified,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -82,7 +82,7 @@ fun BrandFoodItem(
                         id = if (isLiked) R.drawable.heart_selected else R.drawable.heart_unselected
                     ),
                     contentDescription = "Like",
-                    tint = Color.Unspecified,
+                    tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
                         .size(28.dp)
                         .clickable { isLiked = !isLiked }

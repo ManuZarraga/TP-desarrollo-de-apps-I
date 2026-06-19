@@ -239,7 +239,7 @@ fun CrearReseniaScreen(
                                             id = if (index < puntuacion) R.drawable.star_selected else R.drawable.star_unselected
                                         ),
                                         contentDescription = null,
-                                        tint = Color.Unspecified,
+                                        tint = if (index < puntuacion) MaterialTheme.colorScheme.primary else Color.Unspecified,
                                         modifier = Modifier
                                             .size(32.dp)
                                             .clickable { puntuacion = index + 1 }

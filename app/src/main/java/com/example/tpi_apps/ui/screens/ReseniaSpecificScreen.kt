@@ -321,7 +321,7 @@ fun UserReviewCard(review: Review, isLiked: Boolean) {
                             id = if (index < review.rating) R.drawable.star_selected else R.drawable.star_unselected
                         ),
                         contentDescription = null,
-                        tint = Color.Unspecified,
+                        tint = if (index < review.rating) MaterialTheme.colorScheme.primary else Color.Unspecified,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(2.dp))

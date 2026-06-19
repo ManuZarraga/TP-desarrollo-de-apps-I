@@ -113,7 +113,7 @@ fun ReviewItem(
                                     id = if (index < review.rating) R.drawable.star_selected else R.drawable.star_unselected
                                 ),
                                 contentDescription = null,
-                                tint = Color.Unspecified,
+                                tint = if (index < review.rating) MaterialTheme.colorScheme.primary else Color.Unspecified,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(2.dp))
@@ -147,7 +147,7 @@ fun ReviewItem(
                         Icon(
                             painter = painterResource(id = R.drawable.calendar),
                             contentDescription = null,
-                            tint = Color.Unspecified,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(12.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -164,7 +164,7 @@ fun ReviewItem(
                         Icon(
                             painter = painterResource(id = R.drawable.clock),
                             contentDescription = null,
-                            tint = Color.Unspecified,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(12.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
