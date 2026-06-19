@@ -3,6 +3,7 @@ package com.example.tpi_apps.data.network
 import com.example.tpi_apps.data.model.Brand
 import com.example.tpi_apps.data.model.Food
 import com.example.tpi_apps.data.model.Review
+import com.example.tpi_apps.data.model.User
 import kotlinx.serialization.Serializable
 import retrofit2.http.*
 
@@ -13,6 +14,18 @@ data class ReviewLikeRequest(
 )
 
 interface SupabaseApiService {
+
+    @GET("profiles")
+    suspend fun getProfile(
+        @Query("id") id: String,
+        @Query("select") select: String = "*"
+    ): List<User>
+
+    @POST("profiles")
+    suspend fun createProfile(
+        @Body user: User,
+        @Header("Prefer") prefer: String = "return=minimal"
+    )
 
     @GET("brands")
     suspend fun getBrands(

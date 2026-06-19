@@ -18,6 +18,8 @@ import com.example.tpi_apps.ui.screens.ConfirmationScreen
 import com.example.tpi_apps.ui.screens.ReseniaListScreen
 import com.example.tpi_apps.ui.screens.ReseniaSpecificScreen
 import com.example.tpi_apps.ui.screens.OnboardingScreen
+import com.example.tpi_apps.ui.auth.LoginScreen
+import com.example.tpi_apps.ui.auth.SignUpScreen
 
 @Composable
 fun AppNavigation(
@@ -25,11 +27,12 @@ fun AppNavigation(
     user: User,
     isDarkTheme: Boolean,
     onToggleDarkTheme: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    startDestination: String = Routes.Onboarding.route
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routes.Onboarding.route,
+        startDestination = startDestination,
         modifier = modifier
     ) {
         composable(
@@ -39,9 +42,36 @@ fun AppNavigation(
         ) {
             OnboardingScreen(
                 onFinish = {
-                    navController.navigate(Routes.Inicio.route) {
+                    navController.navigate(Routes.Login.route) {
                         popUpTo(Routes.Onboarding.route) { inclusive = true }
                     }
+                }
+            )
+        }
+        composable(
+            Routes.Login.route,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) }
+        ) {
+            LoginScreen(
+                onLoginSuccess = {
+                    navController.navigate(Routes.Inicio.route) {
+                        popUpTo(Routes.Login.route) { inclusive = true }
+                    }
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Routes.SignUp.route)
+                }
+            )
+        }
+        composable(
+            Routes.SignUp.route,
+            enterTransition = { fadeIn(animationSpec = tween(400)) },
+            exitTransition = { fadeOut(animationSpec = tween(400)) }
+        ) {
+            SignUpScreen(
+                onNavigateToLogin = {
+                    navController.popBackStack()
                 }
             )
         }

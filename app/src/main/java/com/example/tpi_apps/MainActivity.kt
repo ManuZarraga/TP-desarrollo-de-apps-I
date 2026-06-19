@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,7 +24,10 @@ import com.example.tpi_apps.ui.components.BottomNavigationBar
 import com.example.tpi_apps.ui.navigation.AppNavigation
 import com.example.tpi_apps.ui.navigation.Routes
 import com.example.tpi_apps.ui.theme.TPIappsTheme
+import com.example.tpi_apps.ui.theme.TPIappsTheme
 import com.example.tpi_apps.util.LevelCalculator
+import com.example.tpi_apps.data.network.SupabaseModule
+import io.github.jan.supabase.auth.auth
 
 class MainActivity : ComponentActivity() {
 
@@ -36,20 +40,38 @@ class MainActivity : ComponentActivity() {
             var darkTheme by remember { mutableStateOf(false) }
             TPIappsTheme(darkTheme = darkTheme) {
                 val navController = rememberNavController()
-                val user by remember {
-                    mutableStateOf(
-                        User(
-                            name = "Federico Dip",
-                            username = "federicodip",
-                            email = "federicodip20@gmail.com",
-                            avatarSeed = "profile_main",
-                            points = 360,
-                            level = "Crítico de Plata",
-                            reputation = 4.8,
-                            reviewCount = 2
-                        )
-                    )
+                
+                // Verificar si hay una sesión activa
+                val session = SupabaseModule.client.auth.currentSessionOrNull()
+                val startDest = if (session != null) Routes.Inicio.route else Routes.Onboarding.route
+
+                var currentUser by remember {
+                    mutableStateOf<User?>(null)
                 }
+
+                LaunchedEffect(session) {
+                    if (session != null) {
+                        try {
+                            val profiles = SupabaseModule.apiService.getProfile(session.user?.id ?: "")
+                            if (profiles.isNotEmpty()) {
+                                currentUser = profiles[0]
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+
+                val user = currentUser ?: User(
+                    name = "Federico Dip",
+                    username = "federicodip",
+                    email = "federicodip20@gmail.com",
+                    avatarSeed = "profile_main",
+                    points = 360,
+                    level = "Crítico de Plata",
+                    reputation = 4.8,
+                    reviewCount = 2
+                )
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -57,7 +79,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = navBackStackEntry?.destination?.route
-                    val showBottomBar = currentRoute != Routes.Onboarding.route
+                    val showBottomBar = currentRoute != Routes.Onboarding.route && 
+                                      currentRoute != Routes.Login.route && 
+                                      currentRoute != Routes.SignUp.route
 
                     Scaffold(
                         containerColor = MaterialTheme.colorScheme.background,
@@ -72,7 +96,8 @@ class MainActivity : ComponentActivity() {
                             user = user,
                             isDarkTheme = darkTheme,
                             onToggleDarkTheme = { darkTheme = it },
-                            modifier = Modifier.padding(bottom = if (showBottomBar) innerPadding.calculateBottomPadding() else 0.dp)
+                            modifier = Modifier.padding(bottom = if (showBottomBar) innerPadding.calculateBottomPadding() else 0.dp),
+                            startDestination = startDest
                         )
                     }
                 }

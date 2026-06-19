@@ -2,6 +2,7 @@ package com.example.tpi_apps.data.network
 
 import com.example.tpi_apps.BuildConfig
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.storage.Storage
 import kotlinx.serialization.json.Json
@@ -16,9 +17,10 @@ object SupabaseModule {
     private const val SUPABASE_URL = "https://sathcrjozwcjzsthzomv.supabase.co"
     private val SUPABASE_KEY = BuildConfig.SUPABASE_KEY
 
-    // 1. Cliente de Supabase SDK (Solo para Storage)
+    // 1. Cliente de Supabase SDK (Para Storage y Auth)
     val client: SupabaseClient = createSupabaseClient(SUPABASE_URL, SUPABASE_KEY) {
         install(Storage)
+        install(Auth)
     }
 
     // 2. Configuración de JSON flexible para Retrofit
