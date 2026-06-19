@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
                             user = user,
                             isDarkTheme = darkTheme,
                             onToggleDarkTheme = { darkTheme = it },
-                            modifier = Modifier.padding(if (showBottomBar) innerPadding else PaddingValues(0.dp))
+                            modifier = Modifier.padding(bottom = if (showBottomBar) innerPadding.calculateBottomPadding() else 0.dp)
                         )
                     }
                 }

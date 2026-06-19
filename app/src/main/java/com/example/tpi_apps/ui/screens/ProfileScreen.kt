@@ -175,20 +175,25 @@ fun ProfileScreen(
     val totalPagesCoupons = (allCoupons.size + itemsPerPage - 1).coerceAtLeast(itemsPerPage) / itemsPerPage
     val paginatedCoupons = allCoupons.drop((couponsPage - 1) * itemsPerPage).take(itemsPerPage)
 
-    LazyColumn(
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .background( Brush.verticalGradient(
-                colors = listOf(
-                    MaterialTheme.colorScheme.primary,
-                    MaterialTheme.colorScheme.background,
-                    MaterialTheme.colorScheme.background,
-                    MaterialTheme.colorScheme.background
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.background,
+                        MaterialTheme.colorScheme.background,
+                        MaterialTheme.colorScheme.background
+                    )
                 )
-            )),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            )
     ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().statusBarsPadding(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
         item {
             Card(
                 shape = RoundedCornerShape(24.dp),
@@ -479,6 +484,7 @@ fun ProfileScreen(
 
         item { Spacer(modifier = Modifier.height(16.dp)) }
     }
+}
 
     if (showEditDialog) {
         androidx.compose.ui.window.Dialog(onDismissRequest = { showEditDialog = false }) {

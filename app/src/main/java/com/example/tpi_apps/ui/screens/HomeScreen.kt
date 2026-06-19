@@ -47,11 +47,13 @@ fun HomeScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val categories = viewModel.categories
 
-    Scaffold { innerPadding ->
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+            modifier = Modifier.fillMaxSize()
         ) {
             item {
                 Hero(
