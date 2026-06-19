@@ -46,7 +46,7 @@ fun ReseniaListScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF3A63ED), Color(0xFFFFFFFF))
+                    colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.background)
                 )
             )
     ) {
@@ -71,26 +71,26 @@ fun ReseniaListScreen(
                 IconButton(
                     onClick = { navController.popBackStack() },
                     modifier = Modifier
-                        .background(Color.White, CircleShape)
+                        .background(MaterialTheme.colorScheme.surface, CircleShape)
                         .size(40.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                         contentDescription = "Back",
-                        tint = Color.Black
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
                 IconButton(
                     onClick = { /* TODO */ },
                     modifier = Modifier
-                        .background(Color.White, CircleShape)
+                        .background(MaterialTheme.colorScheme.surface, CircleShape)
                         .size(40.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "Options",
-                        tint = Color.Black
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -119,7 +119,7 @@ fun ReseniaListScreen(
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = "No existen reseñas de este producto",
-                                color = Color.Gray,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
                             )

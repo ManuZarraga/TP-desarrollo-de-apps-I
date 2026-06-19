@@ -33,6 +33,8 @@ import com.example.tpi_apps.logic.ReviewViewModel
 import com.example.tpi_apps.ui.components.ReviewItem
 import com.example.tpi_apps.ui.navigation.Routes
 import androidx.navigation.NavController
+import androidx.compose.ui.res.painterResource
+import com.example.tpi_apps.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -133,6 +135,8 @@ data class Coupon(val icon: String, val title: String, val description: String, 
 fun ProfileScreen(
     user: User,
     navController: NavController,
+    isDarkTheme: Boolean,
+    onToggleDarkTheme: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val nextLevelPoints = 500
@@ -176,10 +180,10 @@ fun ProfileScreen(
             .fillMaxSize()
             .background( Brush.verticalGradient(
                 colors = listOf(
-                    Color(0xFF4E71FA),
-                    Color(0xFFFFFFFF),
-                    Color(0xFFFFFFFF),
-                    Color(0xFFFFFFFF)
+                    MaterialTheme.colorScheme.primary,
+                    MaterialTheme.colorScheme.background,
+                    MaterialTheme.colorScheme.background,
+                    MaterialTheme.colorScheme.background
                 )
             )),
         contentPadding = PaddingValues(16.dp),
@@ -188,8 +192,8 @@ fun ProfileScreen(
         item {
             Card(
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(24.dp))
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                modifier = Modifier.fillMaxWidth().border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(24.dp))
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -215,9 +219,9 @@ fun ProfileScreen(
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
-                            Text(text = "Comensal Verificado", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2563EB))
-                            Text(text = user.name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
-                            Text(text = user.email, fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = Color(0xFF64748B))
+                            Text(text = "Comensal Verificado", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                            Text(text = user.name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            Text(text = user.email, fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                     IconButton(onClick = openSettings) {
@@ -338,13 +342,13 @@ fun ProfileScreen(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Card(
                     shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     modifier = Modifier.weight(1f).height(104.dp)
-                        .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(20.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
                 ) {
                     Column(modifier = Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.SpaceBetween) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("REPUTACIÓN", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF94A3B8), letterSpacing = 0.8.sp)
+                            Text("REPUTACIÓN", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant, letterSpacing = 0.8.sp)
                             Spacer(modifier = Modifier.width(4.dp))
                             Text("★", fontSize = 10.sp, color = Color(0xFFF59E0B))
                         }
@@ -352,24 +356,24 @@ fun ProfileScreen(
                             Text(
                                 text = String.format(java.util.Locale.getDefault(), "%.1f", user.reputation),
                                 fontSize = 28.sp, fontWeight = FontWeight.Black,
-                                color = Color(0xFF1E293B),
+                                color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.alignByBaseline()
                             )
                             Text(
                                 "/5.0",
-                                fontSize = 11.sp, color = Color(0xFF64748B),
+                                fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.alignByBaseline()
                             )
                         }
-                        Text("Valoración media de tus reseñas", fontSize = 8.sp, color = Color(0xFF94A3B8))
+                        Text("Valoración media de tus reseñas", fontSize = 8.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
 
                 Card(
                     shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     modifier = Modifier.weight(1f).height(104.dp)
-                        .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(20.dp))
+                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
                         .clickable {
                             subTab = "reviews"
                         }
@@ -378,14 +382,14 @@ fun ProfileScreen(
                         Text(
                             text = "RESEÑAS CREADAS",
                             fontSize = 9.sp, fontWeight = FontWeight.Bold,
-                            color = Color(0xFF94A3B8), letterSpacing = 0.8.sp
+                            color = MaterialTheme.colorScheme.onSurfaceVariant, letterSpacing = 0.8.sp
                         )
                         Text(
                             "${user.reviewCount}",
                             fontSize = 28.sp, fontWeight = FontWeight.Black,
-                            color = Color(0xFF1E293B)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
-                        Text("Ver historial >", fontSize = 8.5.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2563EB))
+                        Text("Ver historial >", fontSize = 8.5.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
@@ -395,7 +399,7 @@ fun ProfileScreen(
             // --- SUBTABS PILBAR SELECTOR ---
             Card(
                 shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE2E8F0).copy(alpha = 0.6f)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
             ) {
                 Row(
@@ -406,8 +410,8 @@ fun ProfileScreen(
                         onClick = { subTab = "reviews" },
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (subTab == "reviews") Color.White else Color.Transparent,
-                            contentColor = if (subTab == "reviews") Color(0xFF1E293B) else Color(0xFF64748B)
+                            containerColor = if (subTab == "reviews") MaterialTheme.colorScheme.surface else Color.Transparent,
+                            contentColor = if (subTab == "reviews") MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         modifier = Modifier.weight(1f),
                         contentPadding = PaddingValues(vertical = 8.dp),
@@ -419,8 +423,8 @@ fun ProfileScreen(
                         onClick = { subTab = "points" },
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (subTab == "points") Color.White else Color.Transparent,
-                            contentColor = if (subTab == "points") Color(0xFF1E293B) else Color(0xFF64748B)
+                            containerColor = if (subTab == "points") MaterialTheme.colorScheme.surface else Color.Transparent,
+                            contentColor = if (subTab == "points") MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
                         ),
                         modifier = Modifier.weight(1f),
                         contentPadding = PaddingValues(vertical = 8.dp),
@@ -566,6 +570,34 @@ fun ProfileScreen(
                     }
 
                     // Action buttons in a Row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = if (isDarkTheme) "Modo Oscuro" else "Modo Claro",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        IconButton(
+                            onClick = { onToggleDarkTheme(!isDarkTheme) },
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(Color.White.copy(alpha = 0.2f), CircleShape)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = if (isDarkTheme) R.drawable.moon else R.drawable.sun),
+                                contentDescription = "Toggle Dark Mode",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    }
+
+                    // Botones de acción originales
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)

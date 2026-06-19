@@ -31,13 +31,13 @@ fun SectionHeader(
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             ),
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onSurface
         )
         TextButton(onClick = onSeeAllClick) {
             Text(
                 text = "Ver todo",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF3A63ED)
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,10 +20,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun shimmerBrush(): Brush {
+    val baseColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+    val highlightColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+
     val shimmerColors = listOf(
-        Color.LightGray.copy(alpha = 0.6f),
-        Color.LightGray.copy(alpha = 0.2f),
-        Color.LightGray.copy(alpha = 0.6f),
+        baseColor,
+        highlightColor,
+        baseColor,
     )
 
     val transition = rememberInfiniteTransition(label = "shimmer")
@@ -55,7 +59,7 @@ fun ReviewItemSkeleton(
             .padding(horizontal = if (width == null) 16.dp else 0.dp)
             .padding(start = if (width != null) 16.dp else 0.dp, end = if (width != null) 4.dp else 0.dp, bottom = 12.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
@@ -104,7 +108,7 @@ fun ReviewListComponentSkeleton() {
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -190,7 +194,7 @@ fun ReseniaSpecificSkeleton() {
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Box(modifier = Modifier.fillMaxWidth().height(180.dp).clip(RoundedCornerShape(12.dp)).background(brush))
@@ -207,7 +211,7 @@ fun ReseniaSpecificSkeleton() {
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.size(60.dp).clip(RoundedCornerShape(12.dp)).background(brush))
@@ -226,7 +230,7 @@ fun ReseniaSpecificSkeleton() {
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Box(modifier = Modifier.width(180.dp).height(18.dp).clip(RoundedCornerShape(4.dp)).background(brush))

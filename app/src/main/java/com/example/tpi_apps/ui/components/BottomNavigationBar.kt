@@ -48,7 +48,7 @@ fun BottomNavigationBar(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(72.dp),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             shadowElevation = 12.dp
         ) {
             Row(
@@ -81,7 +81,7 @@ fun BottomNavigationBar(navController: NavController) {
                             Icon(
                                 painter = painterResource(id = item.icon),
                                 contentDescription = item.label,
-                                tint = if (isSelected) AppBlue else AppGrey,
+                                tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(
                                     if (item == BottomNavItem.Perfil) perfilIconSize else iconSize
                                 )
@@ -98,7 +98,7 @@ fun BottomNavigationBar(navController: NavController) {
                 .size(64.dp)
                 .shadow(4.dp, CircleShape)
                 .clip(CircleShape)
-                .background(AppBlue)
+                .background(MaterialTheme.colorScheme.primary)
                 .clickable {
                     val camaraRoute = BottomNavItem.Camara.route
                     if (currentRoute != camaraRoute) {
@@ -116,7 +116,7 @@ fun BottomNavigationBar(navController: NavController) {
             Icon(
                 painter = painterResource(id = BottomNavItem.Camara.icon),
                 contentDescription = BottomNavItem.Camara.label,
-                tint = Color.White,
+                tint = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(cameraIconSize)
             )
         }

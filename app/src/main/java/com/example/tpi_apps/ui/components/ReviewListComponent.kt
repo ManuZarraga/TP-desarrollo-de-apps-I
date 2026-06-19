@@ -31,7 +31,7 @@ fun ReviewListComponent(
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         onClick = onClick
     ) {
@@ -45,7 +45,7 @@ fun ReviewListComponent(
                     modifier = Modifier
                         .size(60.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Brush.linearGradient(colors = listOf(Color(0xFF2563EB), Color(0xFF4F46E5)))),
+                        .background(Brush.linearGradient(colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary))),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = "🍔", fontSize = 28.sp)
@@ -58,11 +58,11 @@ fun ReviewListComponent(
                         text = review.username,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
-                        color = Color.Black
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = "Comensal Verificado",
-                        color = Color(0xFF3A63ED),
+                        color = MaterialTheme.colorScheme.primary,
                         fontSize = 12.sp
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -86,14 +86,14 @@ fun ReviewListComponent(
                     Icon(
                         painter = painterResource(id = R.drawable.photo_icon),
                         contentDescription = null,
-                        tint = Color(0xFF3A63ED),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "3 fotos",
                         fontSize = 12.sp,
-                        color = Color(0xFF3A63ED)
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -118,7 +118,7 @@ fun ReviewListComponent(
                     text = review.rating.toDouble().toString(),
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = Color(0xFF3A63ED)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -127,7 +127,7 @@ fun ReviewListComponent(
             Text(
                 text = review.comment ?: "",
                 fontSize = 14.sp,
-                color = Color(0xFF64748B),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )

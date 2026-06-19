@@ -51,7 +51,7 @@ fun HomeScreen(
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             item {
                 Hero(
@@ -167,7 +167,7 @@ fun HomePaginationSection(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = "Previous",
-                tint = if (currentPage > 1) Color(0xFF3A63ED) else Color.Gray
+                tint = if (currentPage > 1) MaterialTheme.colorScheme.primary else Color.Gray
             )
         }
 
@@ -177,14 +177,14 @@ fun HomePaginationSection(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(if (isSelected) Color(0xFF3A63ED) else Color(0xFFE2E8F0))
+                    .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                     .clickable { onPageSelected(page) }
                     .padding(4.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = page.toString(),
-                    color = if (isSelected) Color.White else Color(0xFF94A3B8),
+                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -199,7 +199,7 @@ fun HomePaginationSection(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Next",
-                tint = if (currentPage < totalPages) Color(0xFF3A63ED) else Color.Gray
+                tint = if (currentPage < totalPages) MaterialTheme.colorScheme.primary else Color.Gray
             )
         }
     }

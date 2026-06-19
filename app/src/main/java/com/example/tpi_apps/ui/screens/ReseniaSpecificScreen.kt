@@ -60,7 +60,7 @@ fun ReseniaSpecificScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF3A63ED), Color(0xFFFFFFFF))
+                    colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.background)
                 )
             )
     ) {
@@ -93,26 +93,26 @@ fun ReseniaSpecificScreen(
                         IconButton(
                             onClick = { navController.popBackStack() },
                             modifier = Modifier
-                                .background(Color.White, CircleShape)
+                                .background(MaterialTheme.colorScheme.surface, CircleShape)
                                 .size(40.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                                 contentDescription = "Back",
-                                tint = Color.Black
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
 
                         IconButton(
                             onClick = { /* TODO */ },
                             modifier = Modifier
-                                .background(Color.White, CircleShape)
+                                .background(MaterialTheme.colorScheme.surface, CircleShape)
                                 .size(40.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
                                 contentDescription = "Options",
-                                tint = Color.Black
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -166,7 +166,7 @@ fun ProductCard(review: Review) {
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -228,25 +228,25 @@ fun ProductCard(review: Review) {
                 text = review.itemName,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = review.restaurantName,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
                     painter = painterResource(id = R.drawable.verified_icon),
                     contentDescription = null,
-                    tint = Color(0xFF3A63ED),
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(14.dp)
                 )
             }
             Text(
                 text = "$${review.itemPrice ?: "0.0"}",
-                color = Color(0xFF3A63ED),
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
@@ -261,7 +261,7 @@ fun UserReviewCard(review: Review, isLiked: Boolean) {
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -273,7 +273,7 @@ fun UserReviewCard(review: Review, isLiked: Boolean) {
                     modifier = Modifier
                         .size(60.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(Brush.linearGradient(colors = listOf(Color(0xFF2563EB), Color(0xFF4F46E5)))),
+                        .background(Brush.linearGradient(colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary))),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = "🍔", fontSize = 28.sp)
@@ -286,11 +286,11 @@ fun UserReviewCard(review: Review, isLiked: Boolean) {
                         text = review.username,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
-                        color = Color.Black
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = "Comensal Verificado",
-                        color = Color(0xFF3A63ED),
+                        color = MaterialTheme.colorScheme.primary,
                         fontSize = 12.sp
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -331,7 +331,7 @@ fun UserReviewCard(review: Review, isLiked: Boolean) {
                     text = review.rating.toDouble().toString(),
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = Color(0xFF3A63ED)
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
 
@@ -340,14 +340,14 @@ fun UserReviewCard(review: Review, isLiked: Boolean) {
             Text(
                 text = review.comment ?: "",
                 fontSize = 14.sp,
-                color = Color(0xFF64748B)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Surface(
                 modifier = Modifier.fillMaxWidth(),
-                color = Color(0xFFE0E7FF).copy(alpha = 0.5f),
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Row(
@@ -357,7 +357,7 @@ fun UserReviewCard(review: Review, isLiked: Boolean) {
                     Icon(
                         painter = painterResource(id = R.drawable.like_icon),
                         contentDescription = null,
-                        tint = Color(0xFF3A63ED),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -365,13 +365,13 @@ fun UserReviewCard(review: Review, isLiked: Boolean) {
                         text = "${review.likes}",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF3A63ED)
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = if (isLiked) "Te pareció útil esta reseña" else "A ${review.likes} usuarios les pareció útil esta reseña",
                         fontSize = 10.sp,
-                        color = Color(0xFF64748B)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -386,7 +386,7 @@ fun DescriptionCard(description: String, isLiked: Boolean, onLikeClick: () -> Un
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -394,13 +394,13 @@ fun DescriptionCard(description: String, isLiked: Boolean, onLikeClick: () -> Un
                 text = "Descripción del producto",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = description,
                 fontSize = 14.sp,
-                color = Color(0xFF64748B)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             
             Spacer(modifier = Modifier.height(24.dp))
@@ -409,7 +409,7 @@ fun DescriptionCard(description: String, isLiked: Boolean, onLikeClick: () -> Un
                 onClick = onLikeClick,
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isLiked) Color(0xFFE0E7FF) else Color(0xFF3A63ED)
+                    containerColor = if (isLiked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -417,13 +417,13 @@ fun DescriptionCard(description: String, isLiked: Boolean, onLikeClick: () -> Un
                     Icon(
                         painter = painterResource(id = R.drawable.like_icon),
                         contentDescription = null,
-                        tint = if (isLiked) Color(0xFF3A63ED) else Color.White,
+                        tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = if (isLiked) "Ya no me parece útil" else "Me pareció útil",
-                        color = if (isLiked) Color(0xFF3A63ED) else Color.White,
+                        color = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )

@@ -23,6 +23,8 @@ import com.example.tpi_apps.ui.screens.OnboardingScreen
 fun AppNavigation(
     navController: NavHostController,
     user: User,
+    isDarkTheme: Boolean,
+    onToggleDarkTheme: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -100,7 +102,9 @@ fun AppNavigation(
         ) {
             ProfileScreen(
                 user = user,
-                navController = navController
+                navController = navController,
+                isDarkTheme = isDarkTheme,
+                onToggleDarkTheme = onToggleDarkTheme
             )
         }
         composable(

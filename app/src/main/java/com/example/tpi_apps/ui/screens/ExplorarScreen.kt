@@ -39,7 +39,7 @@ fun ExplorarScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Hero(
             searchQuery = searchQuery,
@@ -74,7 +74,7 @@ fun ExplorarScreen(
                 Text(
                     text = "Cadena o Marca no encontrada",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
             }
@@ -106,12 +106,14 @@ fun BrandCard(
     brand: Brand,
     onClick: () -> Unit
 ) {
-    val backgroundColor = remember(brand.backgroundColor) {
-        try {
-            if (brand.backgroundColor != null) Color(android.graphics.Color.parseColor(brand.backgroundColor))
-            else Color.White
-        } catch (e: Exception) {
-            Color.White
+    val backgroundColor = with(MaterialTheme.colorScheme) {
+        remember(brand.backgroundColor) {
+            try {
+                if (brand.backgroundColor != null) Color(android.graphics.Color.parseColor(brand.backgroundColor))
+                else surface
+            } catch (e: Exception) {
+                surface
+            }
         }
     }
 

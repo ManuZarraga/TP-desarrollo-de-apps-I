@@ -53,7 +53,7 @@ fun ReseniaScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF3A63ED), Color(0xFFFFFFFF))
+                    colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.background)
                 )
             )
     ) {
@@ -82,7 +82,7 @@ fun ReseniaScreen(
                     placeholder = {
                         Text(
                             text = "Buscar productos específicos",
-                            color = Color(0xFF94A3B8),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             fontSize = 14.sp
                         )
                     },
@@ -90,21 +90,21 @@ fun ReseniaScreen(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
-                            tint = Color(0xFF3A63ED),
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(20.dp)
                         )
                     },
-                    textStyle = LocalTextStyle.current.copy(color = Color(0xFF3A63ED)),
+                    textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        disabledContainerColor = Color.White,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        disabledContainerColor = MaterialTheme.colorScheme.surface,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                         disabledIndicatorColor = Color.Transparent,
-                        cursorColor = Color(0xFF3A63ED),
-                        focusedTextColor = Color(0xFF3A63ED),
-                        unfocusedTextColor = Color(0xFF3A63ED)
+                        cursorColor = MaterialTheme.colorScheme.primary,
+                        focusedTextColor = MaterialTheme.colorScheme.primary,
+                        unfocusedTextColor = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(24.dp),
                     singleLine = true
@@ -184,7 +184,7 @@ fun ReseniaScreen(
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 text = if (selectedFilter == ReseniaFilter.FAVORITAS) "No tienes reseñas favoritas" else "No existen reseñas de este producto",
-                                color = Color.Gray,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
                             )
@@ -226,16 +226,16 @@ fun FilterChipItem(
             .clip(RoundedCornerShape(20.dp))
             .clickable { onClick() }
             .then(
-                if (!isSelected) Modifier.border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(20.dp))
+                if (!isSelected) Modifier.border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(20.dp))
                 else Modifier
             ),
-        color = if (isSelected) Color(0xFF3A63ED) else Color.White,
+        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(20.dp)
     ) {
         Text(
             text = text,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
-            color = if (isSelected) Color.White else Color.Black,
+            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
             fontSize = 14.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
         )
@@ -262,7 +262,7 @@ fun ReviewPaginationSection(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = "Previous",
-                tint = if (currentPage > 1) Color(0xFF3A63ED) else Color.Gray
+                tint = if (currentPage > 1) MaterialTheme.colorScheme.primary else Color.Gray
             )
         }
 
@@ -272,14 +272,14 @@ fun ReviewPaginationSection(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(if (isSelected) Color(0xFF3A63ED) else Color(0xFFE2E8F0))
+                    .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                     .clickable { onPageSelected(page) }
                     .padding(4.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = page.toString(),
-                    color = if (isSelected) Color.White else Color(0xFF94A3B8),
+                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -294,7 +294,7 @@ fun ReviewPaginationSection(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = "Next",
-                tint = if (currentPage < totalPages) Color(0xFF3A63ED) else Color.Gray
+                tint = if (currentPage < totalPages) MaterialTheme.colorScheme.primary else Color.Gray
             )
         }
     }

@@ -33,7 +33,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         
         setContent {
-            TPIappsTheme {
+            var darkTheme by remember { mutableStateOf(false) }
+            TPIappsTheme(darkTheme = darkTheme) {
                 val navController = rememberNavController()
                 val user by remember {
                     mutableStateOf(
@@ -69,6 +70,8 @@ class MainActivity : ComponentActivity() {
                         AppNavigation(
                             navController = navController,
                             user = user,
+                            isDarkTheme = darkTheme,
+                            onToggleDarkTheme = { darkTheme = it },
                             modifier = Modifier.padding(if (showBottomBar) innerPadding else PaddingValues(0.dp))
                         )
                     }

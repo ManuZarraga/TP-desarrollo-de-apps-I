@@ -80,7 +80,7 @@ fun CrearReseniaScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF3A63ED), Color(0xFFFFFFFF))
+                    colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.background)
                 )
             )
     ) {
@@ -101,12 +101,12 @@ fun CrearReseniaScreen(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Volver",
-                    tint = Color.Black
+                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -115,7 +115,7 @@ fun CrearReseniaScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 LazyColumn(
@@ -129,7 +129,7 @@ fun CrearReseniaScreen(
                             Text(
                                 text = "Restaurante:",
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF64748B),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.width(100.dp)
                             )
                             ExposedDropdownMenuBox(
@@ -146,12 +146,12 @@ fun CrearReseniaScreen(
                                         .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                         .fillMaxWidth(),
                                     shape = RoundedCornerShape(8.dp),
-                                    textStyle = LocalTextStyle.current.copy(color = Color(0xFF3A63ED)),
+                                    textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary),
                                     colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = Color(0xFF3A63ED),
-                                        unfocusedBorderColor = Color(0xFFCBD5E1),
-                                        focusedTextColor = Color(0xFF3A63ED),
-                                        unfocusedTextColor = Color(0xFF3A63ED)
+                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                        focusedTextColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedTextColor = MaterialTheme.colorScheme.primary
                                     )
                                 )
                                 ExposedDropdownMenu(
@@ -180,7 +180,7 @@ fun CrearReseniaScreen(
                             Text(
                                 text = "Pedido",
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF64748B),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.width(100.dp)
                             )
                             ExposedDropdownMenuBox(
@@ -197,12 +197,12 @@ fun CrearReseniaScreen(
                                         .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                                         .fillMaxWidth(),
                                     shape = RoundedCornerShape(8.dp),
-                                    textStyle = LocalTextStyle.current.copy(color = Color(0xFF3A63ED)),
+                                    textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary),
                                     colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = Color(0xFF3A63ED),
-                                        unfocusedBorderColor = Color(0xFFCBD5E1),
-                                        focusedTextColor = Color(0xFF3A63ED),
-                                        unfocusedTextColor = Color(0xFF3A63ED)
+                                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                        focusedTextColor = MaterialTheme.colorScheme.primary,
+                                        unfocusedTextColor = MaterialTheme.colorScheme.primary
                                     )
                                 )
                                 ExposedDropdownMenu(
@@ -229,7 +229,7 @@ fun CrearReseniaScreen(
                             Text(
                                 text = "Puntuación:",
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF64748B),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.width(100.dp)
                             )
                             Row {
@@ -253,7 +253,7 @@ fun CrearReseniaScreen(
                         Text(
                             text = "Escribe una reseña:",
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF64748B)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         OutlinedTextField(
                             value = comentario,
@@ -262,20 +262,20 @@ fun CrearReseniaScreen(
                                 Text(
                                     "Da un descripción de tu producto, si cumplió con tus expectativas o si llegó igual que en la publicidad...",
                                     fontSize = 12.sp,
-                                    color = Color.Gray
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                 )
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(150.dp),
                             shape = RoundedCornerShape(8.dp),
-                            textStyle = LocalTextStyle.current.copy(color = Color(0xFF3A63ED)),
+                            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF3A63ED),
-                                unfocusedBorderColor = Color(0xFFCBD5E1),
-                                focusedTextColor = Color(0xFF3A63ED),
-                                unfocusedTextColor = Color(0xFF3A63ED),
-                                cursorColor = Color(0xFF3A63ED)
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                focusedTextColor = MaterialTheme.colorScheme.primary,
+                                unfocusedTextColor = MaterialTheme.colorScheme.primary,
+                                cursorColor = MaterialTheme.colorScheme.primary
                             )
                         )
                     }
@@ -290,7 +290,7 @@ fun CrearReseniaScreen(
                                     .weight(1f)
                                     .height(150.dp)
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(Color.LightGray),
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
                                 contentAlignment = Alignment.Center
                             ) {
                                 if (selectedImageUri != null) {
@@ -301,7 +301,7 @@ fun CrearReseniaScreen(
                                         contentScale = ContentScale.Crop
                                     )
                                 } else {
-                                    Icon(Icons.Default.Add, contentDescription = null, tint = Color.Gray)
+                                    Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             }
                             Column(
@@ -312,21 +312,21 @@ fun CrearReseniaScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(71.dp)
-                                        .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
                                         .clip(RoundedCornerShape(8.dp)),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(Icons.Default.Add, contentDescription = null, tint = Color(0xFF1E3A8A))
+                                    Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                 }
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(71.dp)
-                                        .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+                                        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
                                         .clip(RoundedCornerShape(8.dp)),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(Icons.Default.Add, contentDescription = null, tint = Color(0xFF1E3A8A))
+                                    Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                 }
                             }
                         }
@@ -337,9 +337,9 @@ fun CrearReseniaScreen(
                             onClick = { launcher.launch("image/*") },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3A63ED).copy(alpha = 0.54f))
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.54f))
                         ) {
-                            Text("Agregar una nueva foto", color = Color.White)
+                            Text("Agregar una nueva foto", color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
 
@@ -373,12 +373,12 @@ fun CrearReseniaScreen(
                             enabled = !uploading,
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3A63ED))
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
                             if (uploading) {
-                                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
                             } else {
-                                Text("Subir Reseña", color = Color.White)
+                                Text("Subir Reseña", color = MaterialTheme.colorScheme.onPrimary)
                             }
                         }
                     }

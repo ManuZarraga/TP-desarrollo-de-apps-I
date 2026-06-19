@@ -38,7 +38,7 @@ fun ReviewItem(
             .padding(start = if (width != null) 16.dp else 0.dp, end = if (width != null) 4.dp else 0.dp, bottom = 12.dp)
             .clickable(enabled = onClick != null) { onClick?.invoke(review.id) },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
@@ -72,14 +72,14 @@ fun ReviewItem(
                             .align(Alignment.TopEnd)
                             .padding(12.dp)
                             .size(32.dp)
-                            .background(Color.White.copy(alpha = 0.8f), CircleShape)
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f), CircleShape)
                     ) {
                         Icon(
                             painter = painterResource(
                                 id = if (isLiked) R.drawable.heart_selected else R.drawable.heart_unselected
                             ),
                             contentDescription = "Like",
-                            tint = if (isLiked) Color(0xFF3A63ED) else Color.Gray,
+                            tint = if (isLiked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -96,7 +96,7 @@ fun ReviewItem(
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -126,7 +126,7 @@ fun ReviewItem(
                             Icon(
                                 painter = painterResource(id = R.drawable.like_icon),
                                 contentDescription = null,
-                                tint = Color(0xFF3A63ED),
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(14.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
@@ -134,7 +134,7 @@ fun ReviewItem(
                                 text = "${review.likes}",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = Color.Gray
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -154,7 +154,7 @@ fun ReviewItem(
                         Text(
                             text = review.displayDate,
                             fontSize = 11.sp,
-                            color = Color.Gray
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     
@@ -171,7 +171,7 @@ fun ReviewItem(
                         Text(
                             text = review.displayTime,
                             fontSize = 11.sp,
-                            color = Color.Gray
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
