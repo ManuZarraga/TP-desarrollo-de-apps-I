@@ -4,7 +4,9 @@ sealed class Routes(val route: String) {
     object Onboarding : Routes("onboarding")
     object Inicio : Routes("inicio")
     object Resenia : Routes("resenia")
-    object Camara : Routes("camara")
+    object Camara : Routes("camara?imageUri={imageUri}") {
+        fun createRoute(imageUri: String? = null) = if (imageUri != null) "camara?imageUri=$imageUri" else "camara"
+    }
     object Explorar : Routes("explorar")
     object Perfil : Routes("perfil")
     object BrandItems : Routes("brand_items/{brandName}") {

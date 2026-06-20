@@ -70,32 +70,30 @@ class CrearReseniaViewModel : ViewModel() {
         }
     }
 
-    fun submitReview(
+    suspend fun submitReview(
         user: User,
         brandId: String,
         foodId: String,
         rating: Int,
         comment: String,
         imageUrl: String? = null
-    ) {
-        viewModelScope.launch {
-            val now = LocalDate.now()
-            val time = LocalTime.now()
-            
-            val newReview = Review(
-                id = UUID.randomUUID().toString(),
-                userId = "b46a5b6d-9276-47a2-9721-6925000552b7", // Usuario de prueba fijo por ahora
-                brandId = brandId,
-                foodId = foodId,
-                rating = rating,
-                comment = comment,
-                imageUrl = imageUrl,
-                date = now.format(DateTimeFormatter.ISO_DATE),
-                time = time.format(DateTimeFormatter.ofPattern("HH:mm")),
-                likes = 0
-            )
+    ): Boolean {
+        val now = LocalDate.now()
+        val time = LocalTime.now()
+        
+        val newReview = Review(
+            id = UUID.randomUUID().toString(),
+            userId = "1eb2dff9-5247-461b-8a7f-daab49a7c13d", // Usuario de prueba solicitado
+            brandId = brandId,
+            foodId = foodId,
+            rating = rating,
+            comment = comment,
+            imageUrl = imageUrl,
+            date = now.format(DateTimeFormatter.ISO_DATE),
+            time = time.format(DateTimeFormatter.ofPattern("HH:mm")),
+            likes = 0
+        )
 
-            reviewRepository.addReview(newReview)
-        }
+        return reviewRepository.addReview(newReview)
     }
 }

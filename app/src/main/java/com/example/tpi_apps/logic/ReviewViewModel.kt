@@ -84,7 +84,7 @@ class ReviewViewModel(
 
     private fun loadUserLikes() {
         viewModelScope.launch {
-            repository.loadUserLikes("b46a5b6d-9276-47a2-9721-6925000552b7")
+            repository.loadUserLikes("1eb2dff9-5247-461b-8a7f-daab49a7c13d")
         }
     }
 
@@ -103,7 +103,7 @@ class ReviewViewModel(
 
     fun toggleLike(reviewId: String) {
         viewModelScope.launch {
-            val currentUserId = "b46a5b6d-9276-47a2-9721-6925000552b7"
+            val currentUserId = "1eb2dff9-5247-461b-8a7f-daab49a7c13d"
             repository.toggleLike(reviewId, currentUserId)
             repository.getReviews().collect {
                 _allReviews.value = it

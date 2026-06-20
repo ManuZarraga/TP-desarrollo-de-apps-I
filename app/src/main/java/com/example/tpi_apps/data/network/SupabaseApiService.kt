@@ -1,16 +1,11 @@
 package com.example.tpi_apps.data.network
 
+import com.example.tpi_apps.data.dto.ReviewCreateRequest
+import com.example.tpi_apps.data.dto.ReviewLikeRequest
 import com.example.tpi_apps.data.model.Brand
 import com.example.tpi_apps.data.model.Food
 import com.example.tpi_apps.data.model.Review
-import kotlinx.serialization.Serializable
 import retrofit2.http.*
-
-@Serializable
-data class ReviewLikeRequest(
-    @kotlinx.serialization.SerialName("review_id") val reviewId: String,
-    @kotlinx.serialization.SerialName("user_id") val userId: String
-)
 
 interface SupabaseApiService {
 
@@ -32,7 +27,7 @@ interface SupabaseApiService {
 
     @POST("reviews")
     suspend fun addReview(
-        @Body review: Review,
+        @Body review: ReviewCreateRequest,
         @Header("Prefer") prefer: String = "return=minimal"
     )
 

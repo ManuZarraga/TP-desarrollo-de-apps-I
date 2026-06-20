@@ -1,8 +1,9 @@
 package com.example.tpi_apps.data.repository
 
+import com.example.tpi_apps.data.dto.ReviewCreateRequest
+import com.example.tpi_apps.data.dto.ReviewLikeRequest
 import com.example.tpi_apps.data.model.Review
 import com.example.tpi_apps.data.model.ReviewLike
-import com.example.tpi_apps.data.network.ReviewLikeRequest
 import com.example.tpi_apps.data.network.SupabaseModule
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,8 +27,19 @@ class ReviewRepository {
 
     suspend fun addReview(review: Review): Boolean {
         return try {
-            // Retrofit enviará automáticamente el objeto JSON con brand_id, food_id, user_id, etc.
-            SupabaseModule.apiService.addReview(review)
+            val request = ReviewCreateRequest(
+                id = review.id,
+                userId = review.userId ?: "",
+                brandId = review.brandId ?: "",
+                foodId = review.foodId ?: "",
+                rating = review.rating,
+                comment = review.comment,
+                imageUrl = review.imageUrl,
+                date = review.date,
+                time = review.time,
+                likes = review.likes
+            )
+            SupabaseModule.apiService.addReview(request)
             true
         } catch (e: Exception) {
             e.printStackTrace()
