@@ -104,9 +104,20 @@ class ReviewViewModel(
     fun toggleLike(reviewId: String) {
         viewModelScope.launch {
             val currentUserId = "1eb2dff9-5247-461b-8a7f-daab49a7c13d"
-            repository.toggleLike(reviewId, currentUserId)
-            repository.getReviews().collect {
-                _allReviews.value = it
+            val isCurrentlyLiked = likedReviewIds.value.contains(reviewId)
+            val previousReviews = _allReviews.value
+
+            _allReviews.value = _allReviews.value.map { review ->
+                if (review.id == reviewId) {
+                    val newLikes = if (isCurrentlyLiked) (review.likes - 1).coerceAtLeast(0) else review.likes + 1
+                    review.copy(likes = newLikes)
+                } else review
+            }
+
+            val success = repository.toggleLike(reviewId, currentUserId)
+
+            if (!success) {
+                _allReviews.value = previousReviews
             }
         }
     }

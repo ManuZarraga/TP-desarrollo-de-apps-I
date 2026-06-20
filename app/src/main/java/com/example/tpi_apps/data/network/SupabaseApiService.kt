@@ -22,6 +22,7 @@ interface SupabaseApiService {
 
     @GET("reviews")
     suspend fun getReviews(
+        @Query("id") id: String? = null,
         @Query("select") select: String = "*,profiles(username),brands(name),foods(name,category,price,description,image_url)"
     ): List<Review>
 
@@ -39,7 +40,7 @@ interface SupabaseApiService {
     @POST("review_likes")
     suspend fun addLike(
         @Body request: ReviewLikeRequest,
-        @Header("Prefer") prefer: String = "return=representation"
+        @Header("Prefer") prefer: String = "return=minimal"
     )
 
     @DELETE("review_likes")
@@ -50,7 +51,7 @@ interface SupabaseApiService {
 
     @PATCH("reviews")
     suspend fun updateReviewLikes(
-        @Query("id") reviewId: String,
+        @Query("id") id: String,
         @Body updates: Map<String, Int>,
         @Header("Prefer") prefer: String = "return=minimal"
     )

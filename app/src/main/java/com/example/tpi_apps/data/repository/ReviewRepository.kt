@@ -56,36 +56,28 @@ class ReviewRepository {
         }
     }
 
-    suspend fun toggleLike(reviewId: String, userId: String) {
+    suspend fun toggleLike(reviewId: String, userId: String): Boolean {
         val currentLiked = _likedReviewIds.value
         val isLiked = currentLiked.contains(reviewId)
-        
-        try {
-            // 1. Obtener la reseña actual para saber cuántos likes tiene
-            val reviews = SupabaseModule.apiService.getReviews()
-            val review = reviews.find { it.id == reviewId } ?: return
-            
-            if (isLiked) {
-                // 2a. Quitar like de la tabla review_likes
-                SupabaseModule.apiService.removeLike("eq.$reviewId", "eq.$userId")
-                
-                // 3a. Decrementar contador en la tabla reviews
-                val newLikeCount = (review.likes - 1).coerceAtLeast(0)
-                SupabaseModule.apiService.updateReviewLikes("eq.$reviewId", mapOf("likes" to newLikeCount))
-                
-                _likedReviewIds.value = currentLiked - reviewId
-            } else {
-                // 2b. Añadir like a la tabla review_likes
-                SupabaseModule.apiService.addLike(ReviewLikeRequest(reviewId = reviewId, userId = userId))
-                
-                // 3b. Incrementar contador en la tabla reviews
-                val newLikeCount = review.likes + 1
-                SupabaseModule.apiService.updateReviewLikes("eq.$reviewId", mapOf("likes" to newLikeCount))
 
-                _likedReviewIds.value = currentLiked + reviewId
+        _likedReviewIds.value = if (isLiked) currentLiked - reviewId else currentLiked + reviewId
+        
+        return try {
+            if (isLiked) {
+                // Caso: Quitar Like
+                SupabaseModule.apiService.removeLike("eq.$reviewId", "eq.$userId")
+                // 'likes' en la tabla 'reviews' se actualizará vía Trigger en Supabase
+            } else {
+                // Caso: Dar Like
+                SupabaseModule.apiService.addLike(ReviewLikeRequest(reviewId = reviewId, userId = userId))
+                // 'likes' en la tabla 'reviews' se actualizará vía Trigger en Supabase
             }
+            true
         } catch (e: Exception) {
             e.printStackTrace()
+            // Si la red falla, vuelve al estado anterior del botón
+            _likedReviewIds.value = currentLiked
+            false
         }
     }
 
