@@ -34,7 +34,7 @@ class ReviewRepository {
                 foodId = review.foodId ?: "",
                 rating = review.rating,
                 comment = review.comment,
-                imageUrl = review.imageUrl,
+                images = review.images,
                 date = review.date,
                 time = review.time,
                 likes = review.likes

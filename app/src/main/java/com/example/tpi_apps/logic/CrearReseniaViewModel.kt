@@ -76,7 +76,7 @@ class CrearReseniaViewModel : ViewModel() {
         foodId: String,
         rating: Int,
         comment: String,
-        imageUrl: String? = null
+        images: List<String>? = null
     ): Boolean {
         val now = LocalDate.now()
         val time = LocalTime.now()
@@ -88,7 +88,7 @@ class CrearReseniaViewModel : ViewModel() {
             foodId = foodId,
             rating = rating,
             comment = comment,
-            imageUrl = imageUrl,
+            images = images,
             date = now.format(DateTimeFormatter.ISO_DATE),
             time = time.format(DateTimeFormatter.ofPattern("HH:mm")),
             likes = 0

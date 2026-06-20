@@ -11,7 +11,7 @@ data class ReviewCreateRequest(
     @SerialName("food_id") val foodId: String,
     @SerialName("rating") val rating: Int,
     @SerialName("comment") val comment: String?,
-    @SerialName("image_url") val imageUrl: String?,
+    @SerialName("images") val images: List<String>?,
     @SerialName("review_date") val date: String?,
     @SerialName("review_time") val time: String?,
     @SerialName("likes") val likes: Int = 0

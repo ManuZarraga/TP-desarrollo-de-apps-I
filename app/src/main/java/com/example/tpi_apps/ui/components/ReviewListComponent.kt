@@ -90,8 +90,9 @@ fun ReviewListComponent(
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
+                    val photoCount = review.images?.size ?: 0
                     Text(
-                        text = "3 fotos",
+                        text = if (photoCount == 1) "1 foto" else "$photoCount fotos",
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.primary
                     )

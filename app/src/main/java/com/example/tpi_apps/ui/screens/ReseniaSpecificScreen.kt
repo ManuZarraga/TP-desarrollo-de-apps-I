@@ -161,6 +161,32 @@ fun ReseniaSpecificScreen(
 
 @Composable
 fun ProductCard(review: Review) {
+    val photoCount = review.images?.size ?: 0
+    val reviewImages = review.images ?: emptyList()
+
+    @Composable
+    fun ReviewImageSlot(index: Int, modifier: Modifier) {
+        val imageUrl = if (index < reviewImages.size) {
+            val it = reviewImages[index]
+            if (it.startsWith("http")) it
+            else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/reviews/$it"
+        } else if (index == 0) { // Fallback al producto solo para el primer slot si no hay fotos de reseña
+            review.foods?.imageUrl?.let {
+                if (it.startsWith("http")) it
+                else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/foods/$it"
+            }
+        } else null
+
+        AsyncImage(
+            model = imageUrl ?: R.drawable.image_placeholder,
+            contentDescription = null,
+            modifier = modifier.clip(RoundedCornerShape(12.dp)),
+            contentScale = ContentScale.Crop,
+            error = painterResource(id = R.drawable.image_placeholder),
+            placeholder = painterResource(id = R.drawable.image_placeholder)
+        )
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -176,25 +202,9 @@ fun ProductCard(review: Review) {
                     .height(180.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val reviewImageUrl = review.imageUrl?.let {
-                    if (it.startsWith("http")) it
-                    else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/reviews/$it"
-                }
-
-                val foodImageUrl = review.foods?.imageUrl?.let {
-                    if (it.startsWith("http")) it
-                    else "https://sathcrjozwcjzsthzomv.supabase.co/storage/v1/object/public/foods/$it"
-                }
-
-                val finalImageUrl = reviewImageUrl ?: foodImageUrl
-
                 Box(modifier = Modifier.weight(1.5f)) {
-                    AsyncImage(
-                        model = finalImageUrl,
-                        contentDescription = review.itemName,
-                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop
-                    )
+                    ReviewImageSlot(0, Modifier.fillMaxSize())
+                    
                     Box(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
@@ -202,23 +212,17 @@ fun ProductCard(review: Review) {
                             .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
-                        Text("1/3", color = Color.White, fontSize = 10.sp)
+                        Text(
+                            text = if (photoCount == 1) "1 foto" else "$photoCount fotos",
+                            color = Color.White, 
+                            fontSize = 10.sp
+                        )
                     }
                 }
                 
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    AsyncImage(
-                        model = finalImageUrl,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                    AsyncImage(
-                        model = finalImageUrl,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop
-                    )
+                    ReviewImageSlot(1, Modifier.fillMaxWidth().weight(1f))
+                    ReviewImageSlot(2, Modifier.fillMaxWidth().weight(1f))
                 }
             }
 

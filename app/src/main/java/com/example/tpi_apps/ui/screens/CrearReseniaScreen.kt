@@ -397,14 +397,16 @@ fun CrearReseniaScreen(
                             onClick = {
                                 if (selectedBrandId != null && selectedFoodId != null && puntuacion > 0) {
                                     coroutineScope.launch {
-                                        var uploadedUrl: String? = null
-                                        if (selectedImageUris.isNotEmpty()) {
-                                            val uri = selectedImageUris[0]
+                                        val uploadedUrls = mutableListOf<String>()
+                                        for (uri in selectedImageUris) {
                                             val inputStream = context.contentResolver.openInputStream(uri)
                                             val bytes = inputStream?.readBytes()
                                             inputStream?.close()
                                             if (bytes != null) {
-                                                uploadedUrl = viewModel.uploadImage(bytes)
+                                                val url = viewModel.uploadImage(bytes)
+                                                if (url != null) {
+                                                    uploadedUrls.add(url)
+                                                }
                                             }
                                         }
 
@@ -414,7 +416,7 @@ fun CrearReseniaScreen(
                                             foodId = selectedFoodId!!,
                                             rating = puntuacion,
                                             comment = comentario,
-                                            imageUrl = uploadedUrl
+                                            images = if (uploadedUrls.isEmpty()) null else uploadedUrls
                                         )
                                         navController.navigate(Routes.Confirmacion.route)
                                     }

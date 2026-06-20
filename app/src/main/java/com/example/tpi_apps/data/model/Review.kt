@@ -27,13 +27,12 @@ data class Review(
     val foodId: String? = null,
     val rating: Int = 0,
     val comment: String? = "",
-    @SerialName("image_url")
-    val imageUrl: String? = null,
+    @SerialName("images")
+    val images: List<String>? = null,
     @SerialName("review_date")
     val date: String? = "",
     @SerialName("review_time")
     val time: String? = "",
-    @SerialName("likes")
     val likes: Int = 0,
     
     @SerialName("profiles")
@@ -43,6 +42,7 @@ data class Review(
     @SerialName("foods")
     val foods: FoodData? = null
 ) {
+    val imageUrl: String? get() = images?.firstOrNull()
     val username: String get() = profiles?.username ?: "Usuario"
     val restaurantName: String get() = brands?.name ?: "Restaurante"
     val itemName: String get() = foods?.name ?: "Producto"
