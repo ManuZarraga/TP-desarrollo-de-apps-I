@@ -1,10 +1,13 @@
 package com.example.tpi_apps.ui.navigation
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.tpi_apps.data.model.User
 import com.example.tpi_apps.ui.screens.HomeScreen
 import com.example.tpi_apps.ui.screens.ProfileScreen
@@ -100,14 +103,21 @@ fun AppNavigation(
         }
         composable(
             Routes.Camara.route,
+            arguments = listOf(navArgument("imageUri") { 
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
+            }),
             enterTransition = { fadeIn(animationSpec = tween(400)) },
             exitTransition = { fadeOut(animationSpec = tween(400)) }
-        ) {
+        ) { backStackEntry ->
+            val imageUri = backStackEntry.arguments?.getString("imageUri")
             CrearReseniaScreen(
                 user = user,
                 navController = navController,
                 onSettingsClick = { /* TODO */ },
-                onReviewsClick = { /* TODO */ }
+                onReviewsClick = { /* TODO */ },
+                initialImageUri = imageUri?.let { Uri.parse(it) }
             )
         }
         composable(

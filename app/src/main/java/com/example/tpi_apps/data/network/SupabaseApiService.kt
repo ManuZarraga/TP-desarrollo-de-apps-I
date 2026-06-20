@@ -1,17 +1,13 @@
 package com.example.tpi_apps.data.network
 
+import com.example.tpi_apps.data.dto.ReviewCreateRequest
+import com.example.tpi_apps.data.dto.ReviewLikeRequest
 import com.example.tpi_apps.data.model.Brand
 import com.example.tpi_apps.data.model.Food
 import com.example.tpi_apps.data.model.Review
 import com.example.tpi_apps.data.model.User
 import kotlinx.serialization.Serializable
 import retrofit2.http.*
-
-@Serializable
-data class ReviewLikeRequest(
-    @kotlinx.serialization.SerialName("review_id") val reviewId: String,
-    @kotlinx.serialization.SerialName("user_id") val userId: String
-)
 
 interface SupabaseApiService {
 
@@ -40,12 +36,13 @@ interface SupabaseApiService {
 
     @GET("reviews")
     suspend fun getReviews(
+        @Query("id") id: String? = null,
         @Query("select") select: String = "*,profiles(username),brands(name),foods(name,category,price,description,image_url)"
     ): List<Review>
 
     @POST("reviews")
     suspend fun addReview(
-        @Body review: Review,
+        @Body review: ReviewCreateRequest,
         @Header("Prefer") prefer: String = "return=minimal"
     )
 
@@ -57,7 +54,7 @@ interface SupabaseApiService {
     @POST("review_likes")
     suspend fun addLike(
         @Body request: ReviewLikeRequest,
-        @Header("Prefer") prefer: String = "return=representation"
+        @Header("Prefer") prefer: String = "return=minimal"
     )
 
     @DELETE("review_likes")
@@ -68,7 +65,7 @@ interface SupabaseApiService {
 
     @PATCH("reviews")
     suspend fun updateReviewLikes(
-        @Query("id") reviewId: String,
+        @Query("id") id: String,
         @Body updates: Map<String, Int>,
         @Header("Prefer") prefer: String = "return=minimal"
     )

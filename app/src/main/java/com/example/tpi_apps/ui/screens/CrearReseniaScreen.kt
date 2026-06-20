@@ -48,7 +48,8 @@ fun CrearReseniaScreen(
     onSettingsClick: () -> Unit,
     onReviewsClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: CrearReseniaViewModel = viewModel()
+    viewModel: CrearReseniaViewModel = viewModel(),
+    initialImageUri: Uri? = null
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -62,18 +63,27 @@ fun CrearReseniaScreen(
     var pedido by remember { mutableStateOf("") }
     var puntuacion by remember { mutableIntStateOf(0) }
     var comentario by remember { mutableStateOf("") }
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var selectedImageUris by remember { mutableStateOf(listOfNotNull(initialImageUri)) }
+    var currentSlotIndex by remember { mutableIntStateOf(0) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            val newList = selectedImageUris.toMutableList()
+            if (currentSlotIndex < newList.size) {
+                newList[currentSlotIndex] = uri
+            } else {
+                newList.add(uri)
+            }
+            selectedImageUris = newList.take(3)
+        }
+    }
 
     val filteredFoods = foods.filter { it.brandId == selectedBrandId }
 
     var expandedRest by remember { mutableStateOf(false) }
     var expandedPedido by remember { mutableStateOf(false) }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        selectedImageUri = uri
-    }
 
     Box(
         modifier = modifier
@@ -286,17 +296,22 @@ fun CrearReseniaScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
+                            // Slot Principal
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(150.dp)
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .clickable {
+                                        currentSlotIndex = 0
+                                        launcher.launch("image/*")
+                                    },
                                 contentAlignment = Alignment.Center
                             ) {
-                                if (selectedImageUri != null) {
+                                if (selectedImageUris.isNotEmpty()) {
                                     AsyncImage(
-                                        model = selectedImageUri,
+                                        model = selectedImageUris[0],
                                         contentDescription = null,
                                         modifier = Modifier.fillMaxSize(),
                                         contentScale = ContentScale.Crop
@@ -309,25 +324,55 @@ fun CrearReseniaScreen(
                                 modifier = Modifier.weight(1f),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
+                                // Slot 2
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(71.dp)
                                         .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
-                                        .clip(RoundedCornerShape(8.dp)),
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .clickable {
+                                            currentSlotIndex = 1
+                                            launcher.launch("image/*")
+                                        },
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                    if (selectedImageUris.size > 1) {
+                                        AsyncImage(
+                                            model = selectedImageUris[1],
+                                            contentDescription = null,
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    } else {
+                                        Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                    }
                                 }
+                                // Slot 3
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(71.dp)
                                         .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
-                                        .clip(RoundedCornerShape(8.dp)),
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .clickable {
+                                            currentSlotIndex = 2
+                                            launcher.launch("image/*")
+                                        },
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                    if (selectedImageUris.size > 2) {
+                                        AsyncImage(
+                                            model = selectedImageUris[2],
+                                            contentDescription = null,
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    } else {
+                                        Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                                    }
                                 }
                             }
                         }
@@ -335,7 +380,10 @@ fun CrearReseniaScreen(
 
                     item {
                         Button(
-                            onClick = { launcher.launch("image/*") },
+                            onClick = { 
+                                currentSlotIndex = selectedImageUris.size.coerceAtMost(2)
+                                launcher.launch("image/*") 
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(8.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.54f))
@@ -349,13 +397,16 @@ fun CrearReseniaScreen(
                             onClick = {
                                 if (selectedBrandId != null && selectedFoodId != null && puntuacion > 0) {
                                     coroutineScope.launch {
-                                        var uploadedUrl: String? = null
-                                        selectedImageUri?.let { uri ->
+                                        val uploadedUrls = mutableListOf<String>()
+                                        for (uri in selectedImageUris) {
                                             val inputStream = context.contentResolver.openInputStream(uri)
                                             val bytes = inputStream?.readBytes()
                                             inputStream?.close()
                                             if (bytes != null) {
-                                                uploadedUrl = viewModel.uploadImage(bytes)
+                                                val url = viewModel.uploadImage(bytes)
+                                                if (url != null) {
+                                                    uploadedUrls.add(url)
+                                                }
                                             }
                                         }
 
@@ -365,7 +416,7 @@ fun CrearReseniaScreen(
                                             foodId = selectedFoodId!!,
                                             rating = puntuacion,
                                             comment = comentario,
-                                            imageUrl = uploadedUrl
+                                            images = if (uploadedUrls.isEmpty()) null else uploadedUrls
                                         )
                                         navController.navigate(Routes.Confirmacion.route)
                                     }
