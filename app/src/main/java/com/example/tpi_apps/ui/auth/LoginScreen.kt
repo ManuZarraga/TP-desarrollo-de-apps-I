@@ -38,7 +38,8 @@ fun LoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     val uiState by viewModel.uiState.collectAsState()
     
-    val backgroundImage = ImageBitmap.imageResource(id = R.drawable.hero_bg)
+    // Cargamos el Painter de forma eficiente para el fondo
+    val backgroundPainter = painterResource(id = R.drawable.hero_bg)
 
     Box(
         modifier = Modifier
@@ -53,13 +54,15 @@ fun LoginScreen(
                     )
                 )
             )
-            .drawBehind {
-                val shader = ImageShader(backgroundImage, TileMode.Repeated, TileMode.Repeated)
-                val brush = ShaderBrush(shader)
-                // Usamos un alpha bajo para que sea sutil y no pixelado
-                drawRect(brush = brush, alpha = 0.08f)
-            }
     ) {
+        Image(
+            painter = backgroundPainter,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            alpha = 0.08f
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()

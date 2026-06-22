@@ -24,6 +24,12 @@ interface SupabaseApiService {
         @Query("select") select: String = "id"
     ): List<User>
 
+    @GET("profiles")
+    suspend fun getProfileByEmail(
+        @Query("email") email: String,
+        @Query("select") select: String = "id"
+    ): List<User>
+
     @POST("profiles")
     suspend fun createProfile(
         @Body user: User,
