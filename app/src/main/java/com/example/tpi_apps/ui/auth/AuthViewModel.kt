@@ -18,34 +18,54 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = AuthState.Loading
             try {
-                val authUser = SupabaseModule.client.auth.signUpWith(Email) {
+                // 1. Validar si el username ya existe
+                // Usamos eq. para el filtro de PostgREST
+                val userCheck = SupabaseModule.apiService.getProfileByUsername("eq.$username")
+                if (userCheck.isNotEmpty()) {
+                    _uiState.value = AuthState.Error("El nombre de usuario ya está en uso.")
+                    return@launch
+                }
+
+                // 2. Registro en Supabase Auth
+                SupabaseModule.client.auth.signUpWith(Email) {
                     this.email = email
                     password = pass
                 }
                 
-                // Si el usuario se creó en Auth, creamos el perfil en la tabla profiles
+                // 2. Obtener el ID real generado por Supabase Auth
+                // Tras el signUp, si no hay confirmación de email, el usuario suele estar ya en la sesión local
+                // o podemos obtenerlo del cliente.
                 val userId = SupabaseModule.client.auth.currentUserOrNull()?.id
+                
                 if (userId != null) {
                     val newUser = User(
                         id = userId,
                         name = name,
                         username = username,
                         email = email,
-                        avatarSeed = username.replace(" ", "_").lowercase(),
+                        avatarSeed = "hamburger",
                         points = 0,
                         level = "Bronce",
                         reputation = 0.0,
                         reviewCount = 0
                     )
+                    
+                    // 3. Crear el perfil en la tabla pública vinculando el UID
                     try {
                         SupabaseModule.apiService.createProfile(newUser)
+                        _uiState.value = AuthState.Success("¡Cuenta creada con éxito! Revisa tu email para confirmar.")
                     } catch (e: Exception) {
-                        println("Error creando perfil: ${e.message}")
+                        // Si falla la creación del perfil pero el usuario de Auth existe
+                        println("Error creando perfil en DB: ${e.message}")
+                        _uiState.value = AuthState.Error("Se creó el usuario pero hubo un problema con el perfil.")
                     }
+                } else {
+                    // Si el email confirmation está activado y el SDK no devuelve el user inmediatamente
+                    _uiState.value = AuthState.Success("Registro iniciado. Por favor, confirma tu email para activar tu cuenta.")
                 }
 
-                _uiState.value = AuthState.Success("Usuario creado correctamente. Revisa tu email para confirmar.")
             } catch (e: Exception) {
+                e.printStackTrace()
                 _uiState.value = AuthState.Error(e.localizedMessage ?: "Error al registrarse")
             }
         }
@@ -61,9 +81,14 @@ class AuthViewModel : ViewModel() {
                 }
                 _uiState.value = AuthState.Authenticated
             } catch (e: Exception) {
+                e.printStackTrace()
                 _uiState.value = AuthState.Error(e.localizedMessage ?: "Error al iniciar sesión")
             }
         }
+    }
+
+    fun getCurrentUserId(): String? {
+        return SupabaseModule.client.auth.currentUserOrNull()?.id
     }
 }
 

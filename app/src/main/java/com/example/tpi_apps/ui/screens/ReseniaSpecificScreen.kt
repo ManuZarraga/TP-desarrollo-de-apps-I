@@ -104,7 +104,7 @@ fun ReseniaSpecificScreen(
                         }
 
                         IconButton(
-                            onClick = { /* TODO */ },
+                            onClick = { /* TO-DO */ },
                             modifier = Modifier
                                 .background(MaterialTheme.colorScheme.surface, CircleShape)
                                 .size(40.dp)
@@ -280,7 +280,10 @@ fun UserReviewCard(review: Review, isLiked: Boolean) {
                         .background(Brush.linearGradient(colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary))),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "🍔", fontSize = 28.sp)
+                    Text(
+                        text = getEmojiForFood(review.profiles?.avatarSeed ?: "hamburger"),
+                        fontSize = 28.sp
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -306,7 +309,7 @@ fun UserReviewCard(review: Review, isLiked: Boolean) {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Súper Gourmet",
+                            text = review.profiles?.level ?: "Bronce",
                             color = Color(0xFFFF7E1C),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold

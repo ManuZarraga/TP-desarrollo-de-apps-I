@@ -30,6 +30,7 @@ fun AppNavigation(
     user: User,
     isDarkTheme: Boolean,
     onToggleDarkTheme: (Boolean) -> Unit,
+    onUserUpdated: (User) -> Unit = {},
     modifier: Modifier = Modifier,
     startDestination: String = Routes.Onboarding.route
 ) {
@@ -43,8 +44,11 @@ fun AppNavigation(
             enterTransition = { fadeIn(animationSpec = tween(400)) },
             exitTransition = { fadeOut(animationSpec = tween(400)) }
         ) {
+            val context = androidx.compose.ui.platform.LocalContext.current
             OnboardingScreen(
                 onFinish = {
+                    val prefs = context.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
+                    prefs.edit().putBoolean("terms_accepted", true).apply()
                     navController.navigate(Routes.Login.route) {
                         popUpTo(Routes.Onboarding.route) { inclusive = true }
                     }
@@ -129,6 +133,7 @@ fun AppNavigation(
         }
         composable(
             Routes.BrandItems.route,
+            arguments = listOf(navArgument("brandName") { type = NavType.StringType }),
             enterTransition = { fadeIn(animationSpec = tween(400)) },
             exitTransition = { fadeOut(animationSpec = tween(400)) }
         ) { backStackEntry ->
@@ -142,9 +147,10 @@ fun AppNavigation(
         ) {
             ProfileScreen(
                 user = user,
-                navController = navController,
                 isDarkTheme = isDarkTheme,
-                onToggleDarkTheme = onToggleDarkTheme
+                onToggleDarkTheme = onToggleDarkTheme,
+                onUserUpdated = onUserUpdated,
+                navController = navController
             )
         }
         composable(
@@ -156,6 +162,10 @@ fun AppNavigation(
         }
         composable(
             Routes.ReseniaList.route,
+            arguments = listOf(
+                navArgument("brandName") { type = NavType.StringType },
+                navArgument("itemName") { type = NavType.StringType }
+            ),
             enterTransition = { fadeIn(animationSpec = tween(400)) },
             exitTransition = { fadeOut(animationSpec = tween(400)) }
         ) { backStackEntry ->
@@ -165,6 +175,7 @@ fun AppNavigation(
         }
         composable(
             Routes.ReseniaSpecific.route,
+            arguments = listOf(navArgument("reviewId") { type = NavType.StringType }),
             enterTransition = { fadeIn(animationSpec = tween(400)) },
             exitTransition = { fadeOut(animationSpec = tween(400)) }
         ) { backStackEntry ->

@@ -1,5 +1,6 @@
 package com.example.tpi_apps.data.network
 
+import com.example.tpi_apps.data.dto.ProfileUpdateRequest
 import com.example.tpi_apps.data.dto.ReviewCreateRequest
 import com.example.tpi_apps.data.dto.ReviewLikeRequest
 import com.example.tpi_apps.data.model.Brand
@@ -15,6 +16,12 @@ interface SupabaseApiService {
     suspend fun getProfile(
         @Query("id") id: String,
         @Query("select") select: String = "*"
+    ): List<User>
+
+    @GET("profiles")
+    suspend fun getProfileByUsername(
+        @Query("username") username: String,
+        @Query("select") select: String = "id"
     ): List<User>
 
     @POST("profiles")
@@ -37,7 +44,7 @@ interface SupabaseApiService {
     @GET("reviews")
     suspend fun getReviews(
         @Query("id") id: String? = null,
-        @Query("select") select: String = "*,profiles(username),brands(name),foods(name,category,price,description,image_url)"
+        @Query("select") select: String = "*,profiles(username,level,avatar_seed),brands(name),foods(name,category,price,description,image_url)"
     ): List<Review>
 
     @POST("reviews")
@@ -61,6 +68,13 @@ interface SupabaseApiService {
     suspend fun removeLike(
         @Query("review_id") reviewId: String,
         @Query("user_id") userId: String
+    )
+
+    @PATCH("profiles")
+    suspend fun updateProfile(
+        @QueryMap filters: Map<String, String>,
+        @Body updates: ProfileUpdateRequest,
+        @Header("Prefer") prefer: String = "return=minimal"
     )
 
     @PATCH("reviews")

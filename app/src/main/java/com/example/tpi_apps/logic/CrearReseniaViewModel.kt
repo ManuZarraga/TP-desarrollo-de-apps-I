@@ -83,7 +83,7 @@ class CrearReseniaViewModel : ViewModel() {
         
         val newReview = Review(
             id = UUID.randomUUID().toString(),
-            userId = "1eb2dff9-5247-461b-8a7f-daab49a7c13d", // Usuario de prueba solicitado
+            userId = user.id, // Usamos el ID del usuario pasado como parámetro
             brandId = brandId,
             foodId = foodId,
             rating = rating,
@@ -94,6 +94,26 @@ class CrearReseniaViewModel : ViewModel() {
             likes = 0
         )
 
-        return reviewRepository.addReview(newReview)
+        val success = reviewRepository.addReview(newReview)
+        if (success) {
+            // Incrementar el contador de reseñas en el perfil del usuario
+            viewModelScope.launch {
+                try {
+                    val updates = com.example.tpi_apps.data.dto.ProfileUpdateRequest(
+                        reviewCount = user.reviewCount + 1
+                    )
+                    user.id?.let { id ->
+                        try {
+                            SupabaseModule.apiService.updateProfile(mapOf("id" to "eq.$id"), updates)
+                        } catch (e: Exception) {
+                            SupabaseModule.apiService.updateProfile(mapOf("email" to "eq.${user.email}"), updates)
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        return success
     }
 }

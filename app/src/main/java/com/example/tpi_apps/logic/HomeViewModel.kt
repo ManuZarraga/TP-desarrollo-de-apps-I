@@ -6,6 +6,8 @@ import com.example.tpi_apps.data.model.Food
 import com.example.tpi_apps.data.model.Review
 import com.example.tpi_apps.data.repository.FoodRepository
 import com.example.tpi_apps.data.repository.ReviewRepository
+import com.example.tpi_apps.data.network.SupabaseModule
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -66,10 +68,23 @@ class HomeViewModel(
         if (foods.isEmpty()) 0 else kotlin.math.ceil(foods.size.toDouble() / limit).toInt()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
-    val categories = listOf("Hamburguesas", "Pizzas", "Sushi", "Pastas", "Shawarma", "Sánguches", "Postres")
+    val categories: StateFlow<List<String>> = _foods.map { foods ->
+        foods.map { it.category }.distinct().sorted()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
         loadData()
+        observeCategories()
+    }
+
+    private fun observeCategories() {
+        viewModelScope.launch {
+            categories.collect { cats ->
+                if (cats.isNotEmpty() && _selectedCategory.value !in cats) {
+                    _selectedCategory.value = cats.first()
+                }
+            }
+        }
     }
 
     private fun loadData() {
@@ -92,9 +107,25 @@ class HomeViewModel(
 
     fun toggleLike(reviewId: String) {
         viewModelScope.launch {
-            // TODO: Obtener el ID del usuario real desde un SessionManager o AuthRepository
-            val currentUserId = "858f623e-63f6-444f-94d7-46606f2e90f2"
-            reviewRepository.toggleLike(reviewId, currentUserId)
+            val currentUserId = SupabaseModule.client.auth.currentUserOrNull()?.id ?: return@launch
+            
+            // Actualización optimista de la lista local
+            val isCurrentlyLiked = likedReviewIds.value.contains(reviewId)
+            val previousReviews = _reviews.value
+
+            _reviews.value = _reviews.value.map { review ->
+                if (review.id == reviewId) {
+                    val newLikes = if (isCurrentlyLiked) (review.likes - 1).coerceAtLeast(0) else review.likes + 1
+                    review.copy(likes = newLikes)
+                } else review
+            }
+
+            val success = reviewRepository.toggleLike(reviewId, currentUserId)
+            
+            if (!success) {
+                // Revertir si falla
+                _reviews.value = previousReviews
+            }
         }
     }
 

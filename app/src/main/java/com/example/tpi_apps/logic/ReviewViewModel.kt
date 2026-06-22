@@ -3,7 +3,9 @@ package com.example.tpi_apps.logic
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tpi_apps.data.model.Review
+import com.example.tpi_apps.data.network.SupabaseModule
 import com.example.tpi_apps.data.repository.ReviewRepository
+import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -84,7 +86,10 @@ class ReviewViewModel(
 
     private fun loadUserLikes() {
         viewModelScope.launch {
-            repository.loadUserLikes("1eb2dff9-5247-461b-8a7f-daab49a7c13d")
+            val currentUserId = SupabaseModule.client.auth.currentUserOrNull()?.id
+            if (currentUserId != null) {
+                repository.loadUserLikes(currentUserId)
+            }
         }
     }
 
@@ -103,7 +108,7 @@ class ReviewViewModel(
 
     fun toggleLike(reviewId: String) {
         viewModelScope.launch {
-            val currentUserId = "1eb2dff9-5247-461b-8a7f-daab49a7c13d"
+            val currentUserId = SupabaseModule.client.auth.currentUserOrNull()?.id ?: return@launch
             val isCurrentlyLiked = likedReviewIds.value.contains(reviewId)
             val previousReviews = _allReviews.value
 
@@ -131,11 +136,17 @@ class ReviewViewModel(
         )
 
     fun getReviewById(reviewId: String): StateFlow<Review?> = _allReviews
-        .map { reviews -> reviews.find { it.id == reviewId } }
+        .map { reviews -> 
+            val review = reviews.find { it.id == reviewId }
+            if (review == null && _allReviews.value.isNotEmpty()) {
+
+            }
+            review
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
+            initialValue = _allReviews.value.find { it.id == reviewId }
         )
 
     fun getItemReviews(brandName: String, itemName: String): StateFlow<List<Review>> = combine(_allReviews, _currentPage) { reviews, page ->
@@ -162,7 +173,10 @@ class ReviewViewModel(
     }
 
     val userReviews: StateFlow<List<Review>> = _allReviews
-        .map { reviews -> reviews.filter { it.profiles?.username == "federicodip" || it.username == "Federico Dip" } }
+        .map { reviews -> 
+            val currentUserId = SupabaseModule.client.auth.currentUserOrNull()?.id
+            reviews.filter { it.userId == currentUserId } 
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

@@ -1,509 +1,496 @@
 package com.example.tpi_apps.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.tpi_apps.data.model.User
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.tpi_apps.R
+import com.example.tpi_apps.data.model.User
+import com.example.tpi_apps.logic.ProfileViewModel
+
 import com.example.tpi_apps.logic.ReviewViewModel
 import com.example.tpi_apps.ui.components.ReviewItem
+import com.example.tpi_apps.ui.components.ReviewListComponent
 import com.example.tpi_apps.ui.navigation.Routes
-import androidx.navigation.NavController
-import androidx.compose.ui.res.painterResource
-import com.example.tpi_apps.R
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun RewardItem(coupon: Coupon, userPoints: Int, onCanjearClick: () -> Unit) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        modifier = Modifier.fillMaxWidth().border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(16.dp)).padding(12.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(coupon.icon, fontSize = 14.sp)
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(coupon.title, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
-                }
-                Text(coupon.description, fontSize = 9.sp, color = Color(0xFF64748B))
-            }
-            Button(
-                onClick = onCanjearClick,
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF59E0B), contentColor = Color.White),
-                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                enabled = userPoints >= coupon.cost
-            ) {
-                Text(text = "Canjear (${coupon.cost} pts)", fontSize = 9.sp, fontWeight = FontWeight.Bold)
-            }
-        }
-    }
-}
-
-@Composable
-fun PaginationControls(
-    currentPage: Int,
-    totalPages: Int,
-    onPageSelected: (Int) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 24.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(
-            onClick = { if (currentPage > 1) onPageSelected(currentPage - 1) },
-            enabled = currentPage > 1
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "Previous",
-                tint = if (currentPage > 1) Color(0xFF3A63ED) else Color.Gray
-            )
-        }
-
-        for (page in 1..totalPages) {
-            val isSelected = page == currentPage
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(if (isSelected) Color(0xFF3A63ED) else Color(0xFFE2E8F0))
-                    .clickable { onPageSelected(page) }
-                    .padding(4.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = page.toString(),
-                    color = if (isSelected) Color.White else Color(0xFF94A3B8),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            if (page < totalPages) Spacer(modifier = Modifier.width(8.dp))
-        }
-
-        IconButton(
-            onClick = { if (currentPage < totalPages) onPageSelected(currentPage + 1) },
-            enabled = currentPage < totalPages
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Next",
-                tint = if (currentPage < totalPages) Color(0xFF3A63ED) else Color.Gray
-            )
-        }
-    }
-}
-
-data class Coupon(val icon: String, val title: String, val description: String, val cost: Int, val restaurant: String)
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     user: User,
-    navController: NavController,
     isDarkTheme: Boolean,
     onToggleDarkTheme: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    onUserUpdated: (User) -> Unit,
+    navController: NavController,
+    profileViewModel: ProfileViewModel = viewModel(),
+    reviewViewModel: ReviewViewModel = viewModel()
 ) {
-    val nextLevelPoints = 500
-    val progressPercent = (user.points.toFloat() / nextLevelPoints).coerceIn(0f, 1f)
-    var currentAvatarIdx by remember { mutableIntStateOf(0) }
-    val avatarOptions = listOf("👤", "🍔", "🍕", "🍰", "🍣", "🌮")
-    var subTab by remember { mutableStateOf("reviews") }
-    var reviewsPage by remember { mutableIntStateOf(1) }
-    var couponsPage by remember { mutableIntStateOf(1) }
-    val itemsPerPage = 4
-
     var showEditDialog by remember { mutableStateOf(false) }
-    var tempName by remember { mutableStateOf(user.name) }
-    var tempEmail by remember { mutableStateOf(user.email) }
-    val openSettings = {
-        showEditDialog = true
-    }
-
-    val viewModel: ReviewViewModel = viewModel()
-    val userReviews by viewModel.getUserReviews(user.name).collectAsStateWithLifecycle()
-    val likedReviewIds by viewModel.likedReviewIds.collectAsStateWithLifecycle()
-
-    val totalPagesReviews = (userReviews.size + itemsPerPage - 1).coerceAtLeast(itemsPerPage) / itemsPerPage
-    val paginatedReviews = userReviews.drop((reviewsPage - 1) * itemsPerPage).take(itemsPerPage)
-
-    val allCoupons = remember {
-        listOf(
-            Coupon("🌮", "Cupón - Orden de Tacos", "Canjeable en 'El Trompo Dorado'. Válido por 3 tacos al pastor.", 200, "El Trompo Dorado"),
-            Coupon("🍕", "Descuento en Ristorante", "Válido en la compra de pizza familiar. Canjea -400 pts.", 400, "Ristorante"),
-            Coupon("🍔", "Burger Gratis", "Canjeable en 'Big Burger'. Válido por una Burger Simple.", 300, "Big Burger"),
-            Coupon("🍣", "Rolls de Regalo", "Válido en 'Sushi Zen'. 6 rolls a elección.", 500, "Sushi Zen"),
-            Coupon("🍦", "Postre Helado", "Cualquier sabor en 'Heladería Artic'.", 150, "Heladería Artic"),
-            Coupon("🥤", "Bebida Grande", "En la compra de cualquier combo en 'FastFood'.", 100, "FastFood")
-        )
-    }
-    val totalPagesCoupons = (allCoupons.size + itemsPerPage - 1).coerceAtLeast(itemsPerPage) / itemsPerPage
-    val paginatedCoupons = allCoupons.drop((couponsPage - 1) * itemsPerPage).take(itemsPerPage)
+    val userReviews by reviewViewModel.userReviews.collectAsState()
+    val isLoadingReviews by reviewViewModel.isLoading.collectAsState()
 
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.background,
-                        MaterialTheme.colorScheme.background,
-                        MaterialTheme.colorScheme.background
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        // Fondo con gradiente superior azul suave
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF5C7CFA).copy(alpha = 0.8f),
+                            MaterialTheme.colorScheme.background
+                        )
                     )
                 )
-            )
-    ) {
+        )
+
         LazyColumn(
-            modifier = Modifier.fillMaxSize().statusBarsPadding(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-        item {
-            Card(
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                modifier = Modifier.fillMaxWidth().border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(24.dp))
-            ) {
+            item { Spacer(modifier = Modifier.height(40.dp)) }
+
+            // Card del Perfil
+            item {
+                ProfileHeaderCard(
+                    user = user,
+                    onEditClick = { showEditDialog = true }
+                )
+            }
+
+            // Estadísticas (Puntos y Rango)
+            item {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(modifier = Modifier.size(56.dp)) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier.size(56.dp).clip(RoundedCornerShape(16.dp))
-                                    .background(Brush.linearGradient(colors = listOf(Color(0xFF2563EB), Color(0xFF4F46E5))))
-                            ) {
-                                Text(text = avatarOptions[currentAvatarIdx], fontSize = 28.sp)
-                            }
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier.size(22.dp).align(Alignment.BottomEnd).offset(4.dp, 4.dp).clip(CircleShape)
-                                    .background(Color(0xFF1E293B)).clickable { currentAvatarIdx = (currentAvatarIdx + 1) % avatarOptions.size }
-                            ) {
-                                Text("🔄", fontSize = 10.sp, color = Color.White)
-                            }
-                        }
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column {
-                            Text(text = "Comensal Verificado", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                            Text(text = user.name, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                            Text(text = user.email, fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    }
-                    IconButton(onClick = openSettings) {
-                        Icon(imageVector = Icons.Default.Settings, contentDescription = "Ajustes", tint = Color(0xFF94A3B8))
-                    }
+                    StatCard(
+                        title = "Puntos",
+                        value = "${user.points} pts",
+                        subtitle = "${(user.getProgressPercent() * 100).toInt()}% para Rango Oro",
+                        icon = Icons.Default.EmojiEvents,
+                        modifier = Modifier.weight(1.1f),
+                        showProgress = true,
+                        progress = user.getProgressPercent()
+                    )
+                    StatCard(
+                        title = "Rango",
+                        value = user.level,
+                        subtitle = "Activo",
+                        icon = Icons.Default.Star,
+                        modifier = Modifier.weight(0.9f),
+                        showStatus = true
+                    )
                 }
             }
-        }
 
-        item {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-
-                Card(
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                    modifier = Modifier.weight(1f).height(116.dp)
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(
-                                    Color(0xFF0F172A),
-                                    Color(0xFF1E1B4B)
-                                )
-                            ), RoundedCornerShape(20.dp)
-                        )
-                        .border(1.dp, Color(0xFF4F46E5).copy(alpha = 0.3f), RoundedCornerShape(20.dp))
+            // Segunda fila de estadísticas
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(12.dp),
-                        verticalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("🏆", fontSize = 11.sp)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Puntos", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF818CF8))
-                        }
-                        Row {
-                            Text("${user.points}", fontSize = 24.sp, fontWeight = FontWeight.Black, color = Color.White, modifier = Modifier.alignByBaseline())
-                            Text(" pts", fontSize = 10.sp, color = Color(0xFF818CF8), modifier = Modifier.alignByBaseline())
-                        }
-                        Column {
-                            LinearProgressIndicator(
-                                progress = { progressPercent },
-                                color = Color(0xFF60A5FA),
-                                trackColor = Color(0xFF1E293B),
-                                modifier = Modifier.fillMaxWidth().height(4.dp)
-                                    .clip(RoundedCornerShape(3.dp))
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text("${(progressPercent * 100).toInt()}% para Rango Oro", fontSize = 8.sp, color = Color(0xFF94A3B8))
-                        }
+                    StatCard(
+                        title = "REPUTACIÓN",
+                        value = "${user.reputation}/5.0",
+                        subtitle = "Valoración media de tus reseñas",
+                        icon = Icons.Default.Star,
+                        modifier = Modifier.weight(1f),
+                        iconTint = Color(0xFFFFD700),
+                        isSmallTitle = true
+                    )
+                    StatCard(
+                        title = "RESEÑAS CREADAS",
+                        value = user.reviewCount.toString(),
+                        subtitle = "Ver historial >",
+                        icon = null,
+                        modifier = Modifier.weight(1f),
+                        isSmallTitle = true
+                    )
+                }
+            }
+
+            // Pestañas de contenido (Reseñas / Canjes)
+            item {
+                ContentTabs()
+            }
+
+            if (isLoadingReviews) {
+                item {
+                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
                     }
                 }
-
-                val isGold = user.level.contains("Oro") || user.level.contains("Súper")
-                Card(
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                    modifier = Modifier.weight(1f).height(116.dp)
-                        .background(
-                            Brush.linearGradient(
-                                colors = if (isGold) listOf(
-                                    Color(0xFF0F172A),
-                                    Color(0xFF451A03)
-                                ) else listOf(Color(0xFF0F172A), Color(0xFF1E293B))
-                            ), RoundedCornerShape(20.dp)
-                        )
-                        .border(
-                            1.dp,
-                            if (isGold) Color(0xFFF59E0B).copy(alpha = 0.3f) else Color(0xFF334155),
-                            RoundedCornerShape(20.dp)
-                        )
-                ) {
+            } else if (userReviews.isEmpty()) {
+                // Estado de "No hay reseñas" optimizado
+                item {
                     Column(
-                        modifier = Modifier.fillMaxSize().padding(12.dp),
-                        verticalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp, bottom = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.no_reviews_img),
+                            contentDescription = "Sin reseñas",
+                            modifier = Modifier.size(125.dp),
+                            contentScale = ContentScale.Fit
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Oprime en ",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 11.sp
+                            )
                             Icon(
-                                imageVector = Icons.Default.Star,
-                                contentDescription = "Star",
-                                tint = if (isGold) Color(0xFFF59E0B) else Color(0xFF94A3B8),
-                                modifier = Modifier.size(14.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                "Rango",
-                                fontSize = 9.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFCBD5E1)
-                            )
-                        }
-                        Text(
-                            text = user.level,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Black,
-                            color = if (isGold) Color(0xFFF59E0B) else Color(0xFFE2E8F0)
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.background(
-                                Color.Black.copy(0.3f),
-                                RoundedCornerShape(6.dp)
-                            ).padding(horizontal = 6.dp, vertical = 2.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier.size(6.dp)
-                                    .background(Color(0xFF10B981), CircleShape)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Activo", fontSize = 8.sp, color = Color.White)
-                        }
-                    }
-                }
-            }
-        }
-
-        item {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Card(
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    modifier = Modifier.weight(1f).height(104.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
-                ) {
-                    Column(modifier = Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.SpaceBetween) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("REPUTACIÓN", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant, letterSpacing = 0.8.sp)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("★", fontSize = 10.sp, color = Color(0xFFF59E0B))
-                        }
-                        Row {
-                            Text(
-                                text = String.format(java.util.Locale.getDefault(), "%.1f", user.reputation),
-                                fontSize = 28.sp, fontWeight = FontWeight.Black,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.alignByBaseline()
+                                imageVector = ImageVector.vectorResource(id = R.drawable.camaraicon),
+                                contentDescription = "Icono cámara",
+                                tint = Color(0xFF3A63ED),
+                                modifier = Modifier.size(16.dp)
                             )
                             Text(
-                                "/5.0",
-                                fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.alignByBaseline()
+                                text = " y sube tu primer reseña!",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 11.sp
                             )
                         }
-                        Text("Valoración media de tus reseñas", fontSize = 8.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
-
-                Card(
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    modifier = Modifier.weight(1f).height(104.dp)
-                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
-                        .clickable {
-                            subTab = "reviews"
+            } else {
+                items(userReviews.size) { index ->
+                    ReviewItem(
+                        review = userReviews[index],
+                        width = null,
+                        onClick = { id: String ->
+                            navController.navigate(Routes.ReseniaSpecific.createRoute(id))
                         }
-                ) {
-                    Column(modifier = Modifier.fillMaxSize().padding(12.dp), verticalArrangement = Arrangement.SpaceBetween) {
-                        Text(
-                            text = "RESEÑAS CREADAS",
-                            fontSize = 9.sp, fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant, letterSpacing = 0.8.sp
-                        )
-                        Text(
-                            "${user.reviewCount}",
-                            fontSize = 28.sp, fontWeight = FontWeight.Black,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text("Ver historial >", fontSize = 8.5.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                    }
+                    )
                 }
             }
+            
+            item { Spacer(modifier = Modifier.height(80.dp)) }
         }
+    }
 
-        item {
-            // --- SUBTABS PILBAR SELECTOR ---
-            Card(
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Button(
-                        onClick = { subTab = "reviews" },
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (subTab == "reviews") MaterialTheme.colorScheme.surface else Color.Transparent,
-                            contentColor = if (subTab == "reviews") MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        modifier = Modifier.weight(1f),
-                        contentPadding = PaddingValues(vertical = 8.dp),
-                        elevation = if (subTab == "reviews") ButtonDefaults.buttonElevation(defaultElevation = 1.dp) else null
-                    ) {
-                        Text(text = "✍️ Reseñas", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-                    Button(
-                        onClick = { subTab = "points" },
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (subTab == "points") MaterialTheme.colorScheme.surface else Color.Transparent,
-                            contentColor = if (subTab == "points") MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        modifier = Modifier.weight(1f),
-                        contentPadding = PaddingValues(vertical = 8.dp),
-                        elevation = if (subTab == "points") ButtonDefaults.buttonElevation(defaultElevation = 1.dp) else null
-                    ) {
-                        Text(text = "🎁 Canjes", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-        }
-
-        if (subTab == "points") {
-            items(paginatedCoupons) { coupon ->
-                RewardItem(coupon = coupon, userPoints = user.points, onCanjearClick = { /* Handle redeem */ })
-            }
-            item {
-                PaginationControls(
-                    currentPage = couponsPage,
-                    totalPages = totalPagesCoupons,
-                    onPageSelected = { couponsPage = it }
-                )
-            }
-        } else {
-            item {
-                Text(
-                    "Tus Reseñas Recientes",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF475569),
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-            }
-            items(paginatedReviews) { review ->
-                ReviewItem(
-                    review = review,
-                    width = null,
-                    onLikeClick = { viewModel.toggleLike(it) },
-                    isLiked = likedReviewIds.contains(review.id),
-                    onClick = { reviewId ->
-                        navController.navigate(Routes.ReseniaSpecific.createRoute(reviewId))
-                    }
-                )
-            }
-            item {
-                PaginationControls(
-                    currentPage = reviewsPage,
-                    totalPages = totalPagesReviews,
-                    onPageSelected = { reviewsPage = it }
-                )
-            }
-        }
-
-        item { Spacer(modifier = Modifier.height(16.dp)) }
+    if (showEditDialog) {
+        SettingsDialog(
+            user = user,
+            isDarkTheme = isDarkTheme,
+            onToggleDarkTheme = onToggleDarkTheme,
+            onClose = { showEditDialog = false },
+            onUserUpdated = onUserUpdated,
+            profileViewModel = profileViewModel
+        )
     }
 }
 
-    if (showEditDialog) {
-        androidx.compose.ui.window.Dialog(onDismissRequest = { showEditDialog = false }) {
-            Box(
-                modifier = Modifier
-                    .width(290.dp)
-                    .clip(RoundedCornerShape(32.dp))
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(Color(0xFF4E71FA), Color(0xFF94ADFE), Color(0xFFF5F7FF))
-                        )
-                    )
-                    .padding(24.dp)
+@Composable
+fun ProfileHeaderCard(user: User, onEditClick: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
+                // Avatar con Emoji basado en la comida
+                Box(
+                    modifier = Modifier
+                        .size(70.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Color(0xFF3A63ED).copy(alpha = 0.1f))
+                        .border(1.dp, Color(0xFF3A63ED).copy(alpha = 0.2f), RoundedCornerShape(20.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = getEmojiForFood(user.avatarSeed),
+                        fontSize = 32.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = "Comensal Verificado", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF3A63ED))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            painter = painterResource(id = R.drawable.verified_icon),
+                            contentDescription = null,
+                            tint = Color(0xFF3A63ED),
+                            modifier = Modifier.size(10.dp)
+                        )
+                    }
+                    Text(text = user.username, fontSize = 20.sp, fontWeight = FontWeight.Black, color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = user.name, fontSize = 10.sp, fontFamily = FontFamily.Monospace, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+
+                IconButton(onClick = onEditClick) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Ajustes",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+fun getEmojiForFood(seed: String): String {
+    return when (seed.lowercase()) {
+        "taco" -> "🌮"
+        "hamburger" -> "🍔"
+        "pizza" -> "🍕"
+        "pasta" -> "🍝"
+        "helado" -> "🍦"
+        "sushi" -> "🍣"
+        "ramen" -> "🍜"
+        "donuts" -> "🍩"
+        "cake" -> "🍰"
+        "cookie" -> "🍪"
+        else -> "🍔"
+    }
+}
+
+val foodSeeds = listOf("hamburger", "taco", "pizza", "pasta", "helado", "sushi", "ramen", "donuts", "cake", "cookie")
+
+@Composable
+fun StatCard(
+    title: String,
+    value: String,
+    subtitle: String,
+    icon: ImageVector?,
+    modifier: Modifier = Modifier,
+    iconTint: Color = Color(0xFF5C7CFA),
+    showProgress: Boolean = false,
+    progress: Float = 0f,
+    showStatus: Boolean = false,
+    isSmallTitle: Boolean = false
+) {
+    Card(
+        modifier = modifier.height(130.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = if (icon != null && !isSmallTitle) Color(0xFF1E293B) else MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = title,
+                    fontSize = if (isSmallTitle) 10.sp else 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (icon != null && !isSmallTitle) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                icon?.let {
+                    Icon(imageVector = it, contentDescription = null, tint = iconTint, modifier = Modifier.size(16.dp))
+                }
+            }
+
+            Column {
+                Text(
+                    text = value,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = if (icon != null && !isSmallTitle) Color.White else MaterialTheme.colorScheme.onSurface
+                )
+                if (showProgress) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LinearProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(4.dp)
+                            .clip(CircleShape),
+                        color = Color(0xFF5C7CFA),
+                        trackColor = Color.White.copy(alpha = 0.1f)
+                    )
+                }
+                if (showStatus) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 4.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(6.dp)
+                                .background(Color(0xFF4ADE80), CircleShape)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(text = subtitle, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4ADE80))
+                    }
+                } else {
+                    Text(
+                        text = subtitle,
+                        fontSize = 10.sp,
+                        color = if (icon != null && !isSmallTitle) Color.White.copy(alpha = 0.5f) else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ContentTabs() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        TabItem(title = "Reseñas", icon = "✍️", isSelected = true, modifier = Modifier.weight(1f))
+        TabItem(title = "Canjes", icon = "🎁", isSelected = false, modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun TabItem(title: String, icon: String, isSelected: Boolean, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .height(44.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (isSelected) MaterialTheme.colorScheme.surface else Color.Transparent)
+            .clickable { /* Tab click */ },
+        contentAlignment = Alignment.Center
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = icon, fontSize = 14.sp)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = title,
+                fontSize = 13.sp,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+fun SettingsDialog(
+    user: User,
+    isDarkTheme: Boolean,
+    onToggleDarkTheme: (Boolean) -> Unit,
+    onClose: () -> Unit,
+    onUserUpdated: (User) -> Unit,
+    profileViewModel: ProfileViewModel
+) {
+    var tempUsername by remember { mutableStateOf(user.username) }
+    var tempEmail by remember { mutableStateOf(user.email) }
+    var currentAvatarSeed by remember { mutableStateOf(user.avatarSeed) }
+    val isUpdating by profileViewModel.isUpdating.collectAsState()
+
+    Dialog(
+        onDismissRequest = onClose,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(32.dp),
+            color = Color(0xFF1E293B)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Ajustes de Perfil",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Black,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+
                 Column(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Username input card style
+                    // Avatar Selector
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                val currentIndex = foodSeeds.indexOf(currentAvatarSeed.lowercase())
+                                val nextIndex = (currentIndex + 1) % foodSeeds.size
+                                currentAvatarSeed = foodSeeds[nextIndex]
+                            }
+                            .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(Color.White, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = getEmojiForFood(currentAvatarSeed), fontSize = 24.sp)
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text(text = "Icono de perfil", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(text = "Toca para cambiar", color = Color.White.copy(alpha = 0.6f), fontSize = 11.sp)
+                        }
+                    }
+
+                    // Username input
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -513,8 +500,8 @@ fun ProfileScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         BasicTextField(
-                            value = tempName,
-                            onValueChange = { tempName = it },
+                            value = tempUsername,
+                            onValueChange = { tempUsername = it },
                             textStyle = androidx.compose.ui.text.TextStyle(
                                 color = Color(0xFF334155),
                                 fontWeight = FontWeight.Bold,
@@ -524,9 +511,9 @@ fun ProfileScreen(
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
                             decorationBox = { innerTextField ->
-                                if (tempName.isEmpty()) {
+                                if (tempUsername.isEmpty()) {
                                     Text(
-                                        text = "Nuevo nombre",
+                                        text = "Nombre de usuario",
                                         color = Color(0xFF94A3B8),
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 13.sp,
@@ -539,43 +526,7 @@ fun ProfileScreen(
                         )
                     }
 
-                    // Email input card style
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp)
-                            .background(Color.White, RoundedCornerShape(12.dp))
-                            .padding(horizontal = 16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        BasicTextField(
-                            value = tempEmail,
-                            onValueChange = { tempEmail = it },
-                            textStyle = androidx.compose.ui.text.TextStyle(
-                                color = Color(0xFF334155),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp,
-                                textAlign = TextAlign.Center
-                            ),
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth(),
-                            decorationBox = { innerTextField ->
-                                if (tempEmail.isEmpty()) {
-                                    Text(
-                                        text = "Nuevo email",
-                                        color = Color(0xFF94A3B8),
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 13.sp,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                }
-                                innerTextField()
-                            }
-                        )
-                    }
-
-                    // Action buttons in a Row
+                    // Theme toggle
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center,
@@ -603,44 +554,60 @@ fun ProfileScreen(
                         }
                     }
 
-                    // Botones de acción originales
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Button(
                             onClick = {
-                                showEditDialog = false
-                                user.name = tempName
-                                user.email = tempEmail
+                                profileViewModel.logout()
+                                onClose()
                             },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF94A3B8)),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.weight(1f),
+                            contentPadding = PaddingValues(vertical = 12.dp)
+                        ) {
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(text = "Salir", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        }
+
+                        Button(
+                            onClick = {
+                                val userId = user.id
+                                if (userId != null) {
+                                    profileViewModel.updateProfile(userId, user.name, tempUsername, tempEmail, currentAvatarSeed) { success ->
+                                        if (success) {
+                                            onUserUpdated(user.copy(username = tempUsername, email = tempEmail, avatarSeed = currentAvatarSeed))
+                                            onClose()
+                                        }
+                                    }
+                                }
+                            },
+                            enabled = !isUpdating,
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5C7CFA)),
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.weight(1f),
                             contentPadding = PaddingValues(vertical = 12.dp)
                         ) {
-                            Text(
-                                text = "Aplicar",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
-                            )
+                            if (isUpdating) {
+                                CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
+                            } else {
+                                Text(text = "Aplicar", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            }
                         }
+                    }
 
-                        Button(
-                            onClick = { showEditDialog = false },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5B62)),
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier.weight(1f),
-                            contentPadding = PaddingValues(vertical = 12.dp)
-                        ) {
-                            Text(
-                                text = "Cancelar",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
-                            )
-                        }
+                    Button(
+                        onClick = onClose,
+                        enabled = !isUpdating,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5B62)),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(vertical = 12.dp)
+                    ) {
+                        Text(text = "Cancelar", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     }
                 }
             }

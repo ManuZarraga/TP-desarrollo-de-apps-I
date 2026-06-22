@@ -45,7 +45,7 @@ fun HomeScreen(
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val categories = viewModel.categories
+    val categories by viewModel.categories.collectAsState()
 
     Box(
         modifier = modifier

@@ -8,7 +8,7 @@ data class User(
     var name: String,
     val username: String,
     var email: String,
-    @kotlinx.serialization.SerialName("avatar_seed") val avatarSeed: String,
+    @kotlinx.serialization.SerialName("avatar_seed") val avatarSeed: String = "default",
     var points: Int = 0,
     var level: String = "Bronce",
     var reputation: Double = 0.0,

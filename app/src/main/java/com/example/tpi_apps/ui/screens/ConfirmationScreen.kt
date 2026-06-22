@@ -2,7 +2,9 @@ package com.example.tpi_apps.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,17 +38,23 @@ fun ConfirmationScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF3A63ED), Color(0xFFFFFFFF))
+                    colors = if (androidx.compose.foundation.isSystemInDarkTheme()) {
+                        listOf(Color(0xFF1A1C1E), Color(0xFF121212))
+                    } else {
+                        listOf(Color(0xFF3A63ED), Color(0xFFFFFFFF))
+                    }
                 )
             )
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.hero_bg),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
-            alpha = 0.3f
-        )
+        if (!androidx.compose.foundation.isSystemInDarkTheme()) {
+            Image(
+                painter = painterResource(id = R.drawable.hero_bg),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+                alpha = 0.3f
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -59,7 +67,7 @@ fun ConfirmationScreen(
             
             Text(
                 text = "¡Reseña cargada\nexitosamente!",
-                color = Color(0xFF1E3A8A),
+                color = if (androidx.compose.foundation.isSystemInDarkTheme()) Color.White else Color(0xFF1E3A8A),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.ExtraBold,
                 textAlign = TextAlign.Center,
@@ -67,14 +75,14 @@ fun ConfirmationScreen(
             )
 
             Image(
-                painter = painterResource(id = R.drawable.recomiendo_logo),
-                contentDescription = "Logo Recomiendo",
-                modifier = Modifier.size(200.dp)
+                painter = painterResource(id = R.drawable.review_uploaded),
+                contentDescription = "Review Uploaded",
+                modifier = Modifier.size(280.dp)
             )
 
             Text(
                 text = "Recordá que podes editar tu post y agregar nuevas fotos cuando quieras",
-                color = Color(0xFF1E3A8A),
+                color = if (androidx.compose.foundation.isSystemInDarkTheme()) Color.White.copy(alpha = 0.7f) else Color(0xFF1E3A8A),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,

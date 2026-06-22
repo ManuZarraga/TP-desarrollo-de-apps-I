@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.sp
 import com.example.tpi_apps.R
 import com.example.tpi_apps.data.model.Review
 
+import com.example.tpi_apps.ui.screens.getEmojiForFood
+
 @Composable
 fun ReviewListComponent(
     review: Review,
@@ -48,7 +50,10 @@ fun ReviewListComponent(
                         .background(Brush.linearGradient(colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary))),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "🍔", fontSize = 28.sp)
+                    Text(
+                        text = getEmojiForFood(review.profiles?.avatarSeed ?: "hamburger"),
+                        fontSize = 28.sp
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))
@@ -74,7 +79,7 @@ fun ReviewListComponent(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Súper Gourmet",
+                            text = review.profiles?.level ?: "Bronce",
                             color = Color(0xFFFF7E1C),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold

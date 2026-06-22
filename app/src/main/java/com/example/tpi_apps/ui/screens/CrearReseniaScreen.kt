@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.*
@@ -35,9 +36,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import androidx.compose.runtime.collectAsState
 import kotlinx.coroutines.launch
+import java.io.File
 import java.io.InputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,19 +68,28 @@ fun CrearReseniaScreen(
     var comentario by remember { mutableStateOf("") }
     var selectedImageUris by remember { mutableStateOf(listOfNotNull(initialImageUri)) }
     var currentSlotIndex by remember { mutableIntStateOf(0) }
+    var tempPhotoUri by remember { mutableStateOf<Uri?>(null) }
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        if (uri != null) {
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && tempPhotoUri != null) {
             val newList = selectedImageUris.toMutableList()
             if (currentSlotIndex < newList.size) {
-                newList[currentSlotIndex] = uri
+                newList[currentSlotIndex] = tempPhotoUri!!
             } else {
-                newList.add(uri)
+                newList.add(tempPhotoUri!!)
             }
             selectedImageUris = newList.take(3)
         }
+    }
+
+    fun launchCamera(index: Int) {
+        currentSlotIndex = index
+        val file = File(context.externalCacheDir, "review_photo_${System.currentTimeMillis()}.jpg")
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        tempPhotoUri = uri
+        cameraLauncher.launch(uri)
     }
 
     val filteredFoods = foods.filter { it.brandId == selectedBrandId }
@@ -304,8 +316,7 @@ fun CrearReseniaScreen(
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(MaterialTheme.colorScheme.surfaceVariant)
                                     .clickable {
-                                        currentSlotIndex = 0
-                                        launcher.launch("image/*")
+                                        launchCamera(0)
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -316,6 +327,19 @@ fun CrearReseniaScreen(
                                         modifier = Modifier.fillMaxSize(),
                                         contentScale = ContentScale.Crop
                                     )
+                                    // Botón para eliminar
+                                    IconButton(
+                                        onClick = {
+                                            selectedImageUris = selectedImageUris.toMutableList().apply { removeAt(0) }
+                                        },
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .size(24.dp)
+                                            .padding(4.dp)
+                                            .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                                    ) {
+                                        Icon(Icons.Default.Close, contentDescription = "Eliminar", tint = Color.White, modifier = Modifier.size(16.dp))
+                                    }
                                 } else {
                                     Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
@@ -333,8 +357,7 @@ fun CrearReseniaScreen(
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(MaterialTheme.colorScheme.surfaceVariant)
                                         .clickable {
-                                            currentSlotIndex = 1
-                                            launcher.launch("image/*")
+                                            launchCamera(1)
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -345,6 +368,19 @@ fun CrearReseniaScreen(
                                             modifier = Modifier.fillMaxSize(),
                                             contentScale = ContentScale.Crop
                                         )
+                                        // Botón para eliminar
+                                        IconButton(
+                                            onClick = {
+                                                selectedImageUris = selectedImageUris.toMutableList().apply { removeAt(1) }
+                                            },
+                                            modifier = Modifier
+                                                .align(Alignment.TopEnd)
+                                                .size(24.dp)
+                                                .padding(4.dp)
+                                                .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                                        ) {
+                                            Icon(Icons.Default.Close, contentDescription = "Eliminar", tint = Color.White, modifier = Modifier.size(16.dp))
+                                        }
                                     } else {
                                         Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                     }
@@ -358,8 +394,7 @@ fun CrearReseniaScreen(
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(MaterialTheme.colorScheme.surfaceVariant)
                                         .clickable {
-                                            currentSlotIndex = 2
-                                            launcher.launch("image/*")
+                                            launchCamera(2)
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -370,6 +405,19 @@ fun CrearReseniaScreen(
                                             modifier = Modifier.fillMaxSize(),
                                             contentScale = ContentScale.Crop
                                         )
+                                        // Botón para eliminar
+                                        IconButton(
+                                            onClick = {
+                                                selectedImageUris = selectedImageUris.toMutableList().apply { removeAt(2) }
+                                            },
+                                            modifier = Modifier
+                                                .align(Alignment.TopEnd)
+                                                .size(24.dp)
+                                                .padding(4.dp)
+                                                .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                                        ) {
+                                            Icon(Icons.Default.Close, contentDescription = "Eliminar", tint = Color.White, modifier = Modifier.size(16.dp))
+                                        }
                                     } else {
                                         Icon(Icons.Default.Add, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                     }
@@ -381,14 +429,13 @@ fun CrearReseniaScreen(
                     item {
                         Button(
                             onClick = { 
-                                currentSlotIndex = selectedImageUris.size.coerceAtMost(2)
-                                launcher.launch("image/*") 
+                                launchCamera(selectedImageUris.size.coerceAtMost(2))
                             },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.54f))
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
-                            Text("Agregar una nueva foto", color = MaterialTheme.colorScheme.onPrimary)
+                            Text("Tomar una nueva foto", color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
 

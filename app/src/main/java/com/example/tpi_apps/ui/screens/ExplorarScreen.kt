@@ -49,7 +49,7 @@ fun ExplorarScreen(
 
         SectionHeader(
             title = "Elegí la marca que te tienta",
-            onSeeAllClick = { /* TODO */ }
+            onSeeAllClick = { /* No-op for now */ }
         )
 
         if (isLoading) {

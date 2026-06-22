@@ -29,6 +29,7 @@ object SupabaseModule {
         coerceInputValues = true
         isLenient = true
         encodeDefaults = true
+        explicitNulls = false
     }
 
     // 3. Interceptor para Inyectar Headers de Supabase

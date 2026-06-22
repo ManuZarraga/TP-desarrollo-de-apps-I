@@ -4,7 +4,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserData(val username: String = "")
+data class UserData(
+    val username: String = "",
+    val level: String = "Bronce",
+    @SerialName("avatar_seed")
+    val avatarSeed: String? = null
+)
 
 @Serializable
 data class FoodData(
