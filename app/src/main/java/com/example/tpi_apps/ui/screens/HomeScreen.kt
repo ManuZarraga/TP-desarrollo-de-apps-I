@@ -28,6 +28,8 @@ import com.example.tpi_apps.ui.components.*
 
 import com.example.tpi_apps.ui.navigation.Routes
 
+import com.example.tpi_apps.logic.ReviewViewModel
+
 @Composable
 fun HomeScreen(
     user: User,
@@ -35,17 +37,18 @@ fun HomeScreen(
     onSettingsClick: () -> Unit,
     onReviewsClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel()
+    homeViewModel: HomeViewModel = viewModel(),
+    viewModel: ReviewViewModel
 ) {
-    val trendingReviews by viewModel.trendingReviews.collectAsState()
-    val likedReviewIds by viewModel.likedReviewIds.collectAsState()
-    val foods by viewModel.paginatedFoods.collectAsState()
-    val currentPage by viewModel.currentPage.collectAsState()
-    val totalPages by viewModel.totalPages.collectAsState()
-    val selectedCategory by viewModel.selectedCategory.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val categories by viewModel.categories.collectAsState()
+    val trendingReviews by homeViewModel.trendingReviews.collectAsState()
+    val likedReviewIds by homeViewModel.likedReviewIds.collectAsState()
+    val foods by homeViewModel.paginatedFoods.collectAsState()
+    val currentPage by homeViewModel.currentPage.collectAsState()
+    val totalPages by homeViewModel.totalPages.collectAsState()
+    val selectedCategory by homeViewModel.selectedCategory.collectAsState()
+    val searchQuery by homeViewModel.searchQuery.collectAsState()
+    val isLoading by homeViewModel.isLoading.collectAsState()
+    val categories by homeViewModel.categories.collectAsState()
 
     Box(
         modifier = modifier
@@ -58,7 +61,7 @@ fun HomeScreen(
             item {
                 Hero(
                     searchQuery = searchQuery,
-                    onSearchQueryChange = { viewModel.onSearchQueryChanged(it) }
+                    onSearchQueryChange = { homeViewModel.onSearchQueryChanged(it) }
                 )
             }
             item {
@@ -78,7 +81,7 @@ fun HomeScreen(
                         items(trendingReviews) { review ->
                             ReviewItem(
                                 review = review,
-                                onLikeClick = { viewModel.toggleLike(it) },
+                                onLikeClick = { homeViewModel.toggleLike(it) },
                                 isLiked = likedReviewIds.contains(review.id),
                                 onClick = { reviewId ->
                                     navController.navigate(Routes.ReseniaSpecific.createRoute(reviewId))
@@ -113,7 +116,7 @@ fun HomeScreen(
                             name = category,
                             imageRes = imageRes,
                             isSelected = category == selectedCategory,
-                            onClick = { viewModel.onCategorySelected(category) }
+                            onClick = { homeViewModel.onCategorySelected(category) }
                         )
                     }
                 }
@@ -136,7 +139,7 @@ fun HomeScreen(
                         HomePaginationSection(
                             currentPage = currentPage + 1,
                             totalPages = totalPages,
-                            onPageSelected = { viewModel.onPageChanged(it - 1) }
+                            onPageSelected = { homeViewModel.onPageChanged(it - 1) }
                         )
                     }
                 }

@@ -24,6 +24,8 @@ import com.example.tpi_apps.ui.screens.OnboardingScreen
 import com.example.tpi_apps.ui.auth.LoginScreen
 import com.example.tpi_apps.ui.auth.SignUpScreen
 
+import com.example.tpi_apps.logic.ReviewViewModel
+
 @Composable
 fun AppNavigation(
     navController: NavHostController,
@@ -32,7 +34,8 @@ fun AppNavigation(
     onToggleDarkTheme: (Boolean) -> Unit,
     onUserUpdated: (User) -> Unit = {},
     modifier: Modifier = Modifier,
-    startDestination: String = Routes.Onboarding.route
+    startDestination: String = Routes.Onboarding.route,
+    viewModel: ReviewViewModel
 ) {
     NavHost(
         navController = navController,
@@ -91,7 +94,8 @@ fun AppNavigation(
                 user = user,
                 navController = navController,
                 onSettingsClick = { /* TODO */ },
-                onReviewsClick = { /* TODO */ }
+                onReviewsClick = { /* TODO */ },
+                viewModel = viewModel
             )
         }
         composable(
@@ -102,7 +106,8 @@ fun AppNavigation(
             ReseniaScreen(
                 onReviewClick = { reviewId ->
                     navController.navigate(Routes.ReseniaSpecific.createRoute(reviewId))
-                }
+                },
+                viewModel = viewModel
             )
         }
         composable(
@@ -129,7 +134,7 @@ fun AppNavigation(
             enterTransition = { fadeIn(animationSpec = tween(400)) },
             exitTransition = { fadeOut(animationSpec = tween(400)) }
         ) {
-            ExplorarScreen(navController = navController)
+            ExplorarScreen(navController = navController, viewModel = viewModel)
         }
         composable(
             Routes.BrandItems.route,
@@ -150,7 +155,8 @@ fun AppNavigation(
                 isDarkTheme = isDarkTheme,
                 onToggleDarkTheme = onToggleDarkTheme,
                 onUserUpdated = onUserUpdated,
-                navController = navController
+                navController = navController,
+                viewModel = viewModel
             )
         }
         composable(
@@ -171,7 +177,7 @@ fun AppNavigation(
         ) { backStackEntry ->
             val brandName = backStackEntry.arguments?.getString("brandName") ?: ""
             val itemName = backStackEntry.arguments?.getString("itemName") ?: ""
-            ReseniaListScreen(brandName = brandName, itemName = itemName, navController = navController)
+            ReseniaListScreen(brandName = brandName, itemName = itemName, navController = navController, viewModel = viewModel)
         }
         composable(
             Routes.ReseniaSpecific.route,
@@ -180,7 +186,7 @@ fun AppNavigation(
             exitTransition = { fadeOut(animationSpec = tween(400)) }
         ) { backStackEntry ->
             val reviewId = backStackEntry.arguments?.getString("reviewId") ?: ""
-            ReseniaSpecificScreen(reviewId = reviewId, navController = navController)
+            ReseniaSpecificScreen(reviewId = reviewId, navController = navController, viewModel = viewModel)
         }
     }
 }

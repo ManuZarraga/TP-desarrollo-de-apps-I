@@ -49,11 +49,11 @@ fun ProfileScreen(
     onUserUpdated: (User) -> Unit,
     navController: NavController,
     profileViewModel: ProfileViewModel = viewModel(),
-    reviewViewModel: ReviewViewModel = viewModel()
+    viewModel: ReviewViewModel
 ) {
     var showEditDialog by remember { mutableStateOf(false) }
-    val userReviews by reviewViewModel.userReviews.collectAsState()
-    val isLoadingReviews by reviewViewModel.isLoading.collectAsState()
+    val userReviews by viewModel.userReviews.collectAsState()
+    val isLoadingReviews by viewModel.isLoading.collectAsState()
 
     Box(
         modifier = Modifier
@@ -117,7 +117,6 @@ fun ProfileScreen(
                 }
             }
 
-            // Segunda fila de estadísticas
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -143,7 +142,6 @@ fun ProfileScreen(
                 }
             }
 
-            // Pestañas de contenido (Reseñas / Canjes)
             item {
                 ContentTabs()
             }
@@ -155,7 +153,7 @@ fun ProfileScreen(
                     }
                 }
             } else if (userReviews.isEmpty()) {
-                // Estado de "No hay reseñas" optimizado
+                // "No hay reseñas"
                 item {
                     Column(
                         modifier = Modifier

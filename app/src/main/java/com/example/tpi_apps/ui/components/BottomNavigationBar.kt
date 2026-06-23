@@ -66,7 +66,6 @@ fun BottomNavigationBar(navController: NavController) {
             takePictureLauncher.launch(uri)
         }
     }
-    // ------------------------
 
     Box(
         modifier = Modifier

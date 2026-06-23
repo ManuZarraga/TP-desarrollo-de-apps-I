@@ -19,6 +19,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.tpi_apps.data.model.User
 import com.example.tpi_apps.ui.components.BottomNavigationBar
+import com.example.tpi_apps.data.local.AppDatabase
+import com.example.tpi_apps.data.repository.ReviewRepository
+import com.example.tpi_apps.logic.ReviewViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tpi_apps.ui.navigation.AppNavigation
 import com.example.tpi_apps.ui.navigation.Routes
 import com.example.tpi_apps.ui.theme.TPIappsTheme
@@ -31,10 +37,21 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val database = AppDatabase.getDatabase(this)
+        val reviewRepository = ReviewRepository.getInstance(database.reviewDao())
+
         enableEdgeToEdge()
         
         setContent {
             val context = androidx.compose.ui.platform.LocalContext.current
+            val viewModel: ReviewViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        return ReviewViewModel(reviewRepository) as T
+                    }
+                }
+            )
             val prefs = remember { context.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE) }
             
             var darkTheme by remember { 
@@ -43,14 +60,12 @@ class MainActivity : ComponentActivity() {
 
             TPIappsTheme(darkTheme = darkTheme) {
                 val navController = rememberNavController()
-                
-                // 1. Observar el estado de la sesión de Supabase
+
                 val sessionStatus by SupabaseModule.client.auth.sessionStatus.collectAsStateWithLifecycle()
                 val session = (sessionStatus as? SessionStatus.Authenticated)?.session
                 
                 var currentUser by remember { mutableStateOf<User?>(null) }
 
-                // 2. Cargar perfil desde la tabla 'profiles' cuando hay sesión
                 LaunchedEffect(session) {
                     if (session != null) {
                         try {
@@ -59,7 +74,6 @@ class MainActivity : ComponentActivity() {
                             if (profiles.isNotEmpty()) {
                                 currentUser = profiles[0]
                             } else {
-                                // Intentamos sacar info de los metadatos de la sesión si existen
                                 val metaName = session.user?.userMetadata?.get("name")?.toString()?.replace("\"", "")
                                 val metaUser = session.user?.userMetadata?.get("username")?.toString()?.replace("\"", "")
                                 
@@ -88,11 +102,9 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // 3. Estado de usuario y Navegación reactiva
                 LaunchedEffect(sessionStatus) {
                     if (sessionStatus is SessionStatus.NotAuthenticated) {
                         currentUser = null
-                        // Si no hay sesión, volvemos a Onboarding/Login
                         navController.navigate(Routes.Onboarding.route) {
                             popUpTo(0) { inclusive = true }
                         }
@@ -111,7 +123,6 @@ class MainActivity : ComponentActivity() {
                     reviewCount = 0
                 )
 
-                // 4. Determinar destino inicial esperando a que la sesión cargue
                 val isSessionReady = sessionStatus !is SessionStatus.Initializing
                 val hasAcceptedTerms = remember { prefs.getBoolean("terms_accepted", false) }
                 
@@ -161,11 +172,10 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onUserUpdated = { updatedUser ->
                                     currentUser = updatedUser
-                                    // Forzar recarga de reseñas si el contador cambió
-                                    // reviewViewModel.loadReviews() // Si tuviéramos acceso aquí
                                 },
                                 modifier = Modifier.padding(bottom = if (showBottomBar) innerPadding.calculateBottomPadding() else 0.dp),
-                                startDestination = startDest
+                                startDestination = startDest,
+                                viewModel = viewModel
                             )
                         }
                     }

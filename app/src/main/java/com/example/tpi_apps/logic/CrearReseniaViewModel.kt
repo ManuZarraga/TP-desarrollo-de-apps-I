@@ -83,7 +83,7 @@ class CrearReseniaViewModel : ViewModel() {
         
         val newReview = Review(
             id = UUID.randomUUID().toString(),
-            userId = user.id, // Usamos el ID del usuario pasado como parámetro
+            userId = user.id,
             brandId = brandId,
             foodId = foodId,
             rating = rating,
@@ -96,7 +96,6 @@ class CrearReseniaViewModel : ViewModel() {
 
         val success = reviewRepository.addReview(newReview)
         if (success) {
-            // Incrementar el contador de reseñas en el perfil del usuario
             viewModelScope.launch {
                 try {
                     val updates = com.example.tpi_apps.data.dto.ProfileUpdateRequest(

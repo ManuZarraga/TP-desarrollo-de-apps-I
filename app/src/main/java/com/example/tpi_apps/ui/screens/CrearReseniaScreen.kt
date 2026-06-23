@@ -166,7 +166,7 @@ fun CrearReseniaScreen(
                                     placeholder = { Text("Selecciona un restaurante...", fontSize = 12.sp) },
                                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedRest) },
                                     modifier = Modifier
-                                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                        .menuAnchor()
                                         .fillMaxWidth(),
                                     shape = RoundedCornerShape(8.dp),
                                     textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary),
@@ -217,7 +217,7 @@ fun CrearReseniaScreen(
                                     placeholder = { Text("Selecciona lo que pediste...", fontSize = 12.sp) },
                                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedPedido) },
                                     modifier = Modifier
-                                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                        .menuAnchor()
                                         .fillMaxWidth(),
                                     shape = RoundedCornerShape(8.dp),
                                     textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.primary),

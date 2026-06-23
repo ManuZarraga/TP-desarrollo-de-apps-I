@@ -19,4 +19,4 @@ val DarkBackground = Color(0xFF0F172A)
 val DarkSurface = Color(0xFF1E293B)
 val DarkOnBackground = Color(0xFFF8FAFC)
 val DarkOnSurface = Color(0xFFF1F5F9)
-val DarkPrimary = Color(0xFF60A5FA) // A slightly lighter blue for dark mode accessibility
+val DarkPrimary = Color(0xFF60A5FA)

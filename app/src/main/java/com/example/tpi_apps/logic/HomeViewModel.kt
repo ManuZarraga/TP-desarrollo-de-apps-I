@@ -108,8 +108,7 @@ class HomeViewModel(
     fun toggleLike(reviewId: String) {
         viewModelScope.launch {
             val currentUserId = SupabaseModule.client.auth.currentUserOrNull()?.id ?: return@launch
-            
-            // Actualización optimista de la lista local
+
             val isCurrentlyLiked = likedReviewIds.value.contains(reviewId)
             val previousReviews = _reviews.value
 
@@ -123,7 +122,6 @@ class HomeViewModel(
             val success = reviewRepository.toggleLike(reviewId, currentUserId)
             
             if (!success) {
-                // Revertir si falla
                 _reviews.value = previousReviews
             }
         }

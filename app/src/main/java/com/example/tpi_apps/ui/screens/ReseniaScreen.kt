@@ -37,7 +37,7 @@ import com.example.tpi_apps.ui.navigation.Routes
 @Composable
 fun ReseniaScreen(
     modifier: Modifier = Modifier,
-    viewModel: ReviewViewModel = viewModel(),
+    viewModel: ReviewViewModel,
     onReviewClick: (String) -> Unit = {}
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()

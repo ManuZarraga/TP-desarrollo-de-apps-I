@@ -34,7 +34,7 @@ fun ReseniaListScreen(
     brandName: String,
     itemName: String,
     navController: NavController,
-    viewModel: ReviewViewModel = viewModel()
+    viewModel: ReviewViewModel
 ) {
     val reviews by viewModel.getItemReviews(brandName, itemName).collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()

@@ -17,13 +17,12 @@ object SupabaseModule {
     private const val SUPABASE_URL = "https://sathcrjozwcjzsthzomv.supabase.co"
     private val SUPABASE_KEY = BuildConfig.SUPABASE_KEY
 
-    // 1. Cliente de Supabase SDK (Para Storage y Auth)
+    // Supabase SDK (Storage y Auth)
     val client: SupabaseClient = createSupabaseClient(SUPABASE_URL, SUPABASE_KEY) {
         install(Storage)
         install(Auth)
     }
 
-    // 2. Configuración de JSON flexible para Retrofit
     private val json = Json {
         ignoreUnknownKeys = true
         coerceInputValues = true
@@ -32,7 +31,6 @@ object SupabaseModule {
         explicitNulls = false
     }
 
-    // 3. Interceptor para Inyectar Headers de Supabase
     private val headerInterceptor = Interceptor { chain ->
         val request = chain.request().newBuilder()
             .addHeader("apikey", SUPABASE_KEY)
@@ -50,7 +48,7 @@ object SupabaseModule {
         .addInterceptor(loggingInterceptor)
         .build()
 
-    // 4. Instancia de Retrofit
+    // Instancia de Retrofit
     val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl("${SUPABASE_URL}/rest/v1/")
         .client(okHttpClient)

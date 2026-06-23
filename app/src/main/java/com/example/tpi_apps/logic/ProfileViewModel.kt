@@ -32,11 +32,9 @@ class ProfileViewModel : ViewModel() {
                     username = username,
                     avatarSeed = avatarSeed
                 )
-                // Intentar actualizar por ID (preferido)
                 try {
                     SupabaseModule.apiService.updateProfile(mapOf("id" to "eq.$userId"), updates)
                 } catch (e: Exception) {
-                    // Si falla o no encuentra por ID, intentar por email como fallback
                     SupabaseModule.apiService.updateProfile(mapOf("email" to "eq.$email"), updates)
                 }
                 onResult(true)

@@ -26,15 +26,18 @@ import com.example.tpi_apps.ui.components.Hero
 import com.example.tpi_apps.ui.components.SectionHeader
 import com.example.tpi_apps.ui.navigation.Routes
 
+import com.example.tpi_apps.logic.ReviewViewModel
+
 @Composable
 fun ExplorarScreen(
     navController: androidx.navigation.NavController,
     modifier: Modifier = Modifier,
-    viewModel: ExplorarViewModel = viewModel()
+    explorarViewModel: ExplorarViewModel = viewModel(),
+    viewModel: ReviewViewModel
 ) {
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val brands by viewModel.filteredBrands.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val searchQuery by explorarViewModel.searchQuery.collectAsState()
+    val brands by explorarViewModel.filteredBrands.collectAsState()
+    val isLoading by explorarViewModel.isLoading.collectAsState()
 
     Column(
         modifier = modifier
@@ -43,7 +46,7 @@ fun ExplorarScreen(
     ) {
         Hero(
             searchQuery = searchQuery,
-            onSearchQueryChange = { viewModel.onSearchQueryChanged(it) },
+            onSearchQueryChange = { explorarViewModel.onSearchQueryChanged(it) },
             placeholderText = "Buscar una marca específica"
         )
 
